@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect } from "react";
@@ -8,6 +9,7 @@ import UserImage from "./UserImage";
 
 const UserComponent = (info) => {
     const token = useSelector((state) => state.token);
+    const { palette } = useTheme();
     const [user, setUser] = useState(null);
     const getUser = async () => {
         const response = await fetch(`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/users/${info.createdBy}`,
@@ -37,7 +39,16 @@ const UserComponent = (info) => {
     } = user;
 
     return (
-        <Box display="flex">
+        <Box 
+            display="flex" 
+            sx={{
+                border: 1,
+                borderColor: palette.neutral.light 
+            }} 
+            borderRadius="10px" 
+            padding="5px 5px 0 5px" 
+            marginBottom="5px"
+        >
             <UserImage image={picturePath} size="60px"/>
             <Box padding="10px" width="100%">
                 <FlexBetween>

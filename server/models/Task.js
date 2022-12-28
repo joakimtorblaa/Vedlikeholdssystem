@@ -45,8 +45,8 @@ const TaskSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        startDate: String,
-        deadline: String,
+        startDate: Date,
+        deadline: Date,
         createdBy: String,
         userId: String,
 

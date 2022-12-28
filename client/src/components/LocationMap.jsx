@@ -15,7 +15,6 @@ const LocationMap = () => {
     const navigate = useNavigate();
     const token = useSelector((state) => state.token);
     const [locations, setLocations] = useState(null);
-    //const locations = useSelector((state) => state.locations);
 
     const bounds = [
         [ 8.13090, 58.1803  ], //southwest coordinates
@@ -31,7 +30,6 @@ const LocationMap = () => {
             }
         );
         const data = await response.json();
-        console.log(data);
         setLocations(data);
     }
 
@@ -91,7 +89,7 @@ const LocationMap = () => {
                                 minHeight="300px"
                                 padding="1rem"
                             >   
-                                <LocationImage image={marker.picturePath} altText={marker.locationName}/>
+                                <LocationImage image={marker.picturePath} altText={marker.locationName} size={"280px"}/>
                                 <Typography
                                     textAlign="center"
                                     variant="h4"
