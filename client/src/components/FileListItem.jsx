@@ -1,5 +1,4 @@
-import { Delete } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -29,6 +28,7 @@ const FileListItem = (file) => {
     }
 
     const deleteFile = async (e) => {
+        // eslint-disable-next-line
         const response = await fetch(
             `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}/${e}`,
             {
@@ -73,10 +73,10 @@ const FileListItem = (file) => {
                         window.location.href=`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/assets/locations/${file.fileInfo.filename}`
                     }}
                 >
-                <ListItemText
-                    primary={file.fileInfo.originalname}
-                    secondary={convertDate(file.fileInfo.filename)}
-                />
+                    <ListItemText
+                        primary={file.fileInfo.originalname}
+                        secondary={convertDate(file.fileInfo.filename)}
+                    />
                 </ListItemButton>
             </ListItem>
         </>

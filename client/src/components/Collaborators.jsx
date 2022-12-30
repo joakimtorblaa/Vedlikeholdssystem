@@ -4,7 +4,7 @@ const Collaborators = (info) => {
     return (
         <>
             {info.collaborator.map((colab) => (
-                <UserComponent createdBy={colab}/>
+                <UserComponent key={colab} createdBy={colab}/>
             ))}
         </>
     )

@@ -1,4 +1,5 @@
 import Task from '../models/Task.js';
+import {v4 as uuidv4} from 'uuid';
 export const newTask = async (req, res) => {
     try {
         const {
@@ -8,6 +9,7 @@ export const newTask = async (req, res) => {
             locationId,
             createdBy,
             userId,
+            history,
             startDate,
             deadline
         } = req.body;
@@ -21,6 +23,7 @@ export const newTask = async (req, res) => {
             locationId,
             createdBy,
             userId,
+            history,
             startDate,
             deadline,
             collaborators: splitColabs
@@ -57,4 +60,30 @@ export const getLocationTasks = async (req, res) => {
         res.status(404).json({ message: err.message })
     }
 
+}
+
+export const updateTask = async (req, res) => {
+    try {
+        const { id, fullname, status } = req.params;
+        const date = new Date();
+
+        const newHistory = {
+            id : uuidv4(),
+            content : `${fullname} endret oppgavestatus til ${status}.`,
+            timestamp : date.getDate() +"/"+ (date.getMonth()+1) +"/" + date.getFullYear() + " - " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(),
+        }
+        const newHistoryString = JSON.stringify(newHistory);
+        
+
+        const task = await Task.findById(id);
+        task.taskStatus = status;
+        task.history.push(newHistoryString);
+        await task.save();
+
+        const newTask = task.history;
+
+        res.status(201).json(newTask);
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
 }

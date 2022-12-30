@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const taskSchema = yup.object().shape({
@@ -48,6 +49,12 @@ const NewTaskForm = () => {
     const navigate = useNavigate();
     const [collaborator, setCollaborator] = useState([]);
     const [users, setUsers] = useState();
+    const taskHistory = {   
+            id : uuidv4(),
+            content : `Oppgave opprettet av ${fullName}`,
+            timestamp : `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()} kl. ${date.getHours()}:${date.getMinutes()}`,
+        }
+    
 
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
@@ -68,9 +75,7 @@ const NewTaskForm = () => {
         formData.append('locationId', locationId.locationId);
         formData.append('createdBy', fullName);
         formData.append('userId', userId);
-        for (var key of formData.entries()) {
-            console.log(key[0] + ', ' + key[1]);
-        }
+        formData.append('history', JSON.stringify(taskHistory));
         const savedTaskResponse = await fetch(
             `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/new`,
             {
@@ -87,7 +92,6 @@ const NewTaskForm = () => {
     }
 
     const handleFormSubmit = async(values, onSubmitProps) => {
-        console.log(values);
         await newTask(values, onSubmitProps);
     }
 
@@ -100,8 +104,8 @@ const NewTaskForm = () => {
             }
         )
         const data = await response.json();
-        console.log(data);
-        setUsers(data);
+        const filteredData = data.filter(item => !(item._id === userId));
+        setUsers(filteredData);
     }
 
     useEffect(() => {
@@ -111,9 +115,6 @@ const NewTaskForm = () => {
     const handleChangeMultiple = (e) => {
         setCollaborator(e.target.value);
     }
-
-    //Skriv ferdig form kode
-    //Valider new task controller og route
 
     return (
         <Formik
@@ -179,7 +180,7 @@ const NewTaskForm = () => {
                                     label="Startdato for oppgave"
                                     onBlur={handleBlur}
                                     onChange={(newValue) => setFieldValue('startDate', newValue, true)}
-                                    disablePast="true"
+                                    disablePast={true}
                                     maxDate={values.deadline}
                                     value={values.startDate}
                                     renderInput={(params) => (
@@ -198,7 +199,7 @@ const NewTaskForm = () => {
                                     label="Startdato for oppgave"
                                     onBlur={handleBlur}
                                     onChange={(newValue) => setFieldValue('startDate', newValue, true)}
-                                    disablePast="true"
+                                    disablePast={true}
                                     maxDate={values.deadline}
                                     value={values.startDate}
                                     renderInput={(params) => (
@@ -217,7 +218,7 @@ const NewTaskForm = () => {
                                     label="Sluttfrist for oppgave"
                                     onBlur={handleBlur}
                                     onChange={(newValue) => setFieldValue('deadline', newValue, true)}
-                                    disablePast="true"
+                                    disablePast={true}
                                     minDate={values.startDate}
                                     value={values.deadline}
                                     renderInput={(params) => (
@@ -236,7 +237,7 @@ const NewTaskForm = () => {
                                     label="Sluttfrist for oppgave"
                                     onBlur={handleBlur}
                                     onChange={(newValue) => setFieldValue('deadline', newValue, true)}
-                                    disablePast="true"
+                                    disablePast={true}
                                     minDate={values.startDate}
                                     value={values.deadline}
                                     renderInput={(params) => (
