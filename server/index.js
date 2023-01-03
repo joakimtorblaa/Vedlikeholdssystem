@@ -17,6 +17,8 @@ import { register } from "./controllers/auth.js";
 import { newLocation, uploadFileLocation } from "./controllers/locations.js";
 import { newTask } from "./controllers/task.js";
 import { newNotification } from "./controllers/notifications.js";
+import { setFileFolderLocation } from "./middleware/filefolder.js";
+import * as fs from 'fs';
 
 /* CONFIGURATION */
 
@@ -38,8 +40,11 @@ app.use("/assets", express.static(path.join(__dirname, 'public/assets')));
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let path = 'public/assets/' + req.imagesFolder + '/';
+        
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path)
+        }
         file.path = path;
-        //fs.mkdirSync(path);
         cb(null, path);
         
     },
@@ -51,7 +56,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const locationMiddleware = (req, res, next) => {
-    req.imagesFolder = 'locations';
+    req.imagesFolder = 'location_headers';
     next();
 }
 
@@ -67,7 +72,7 @@ app.post("/notifications", upload.none(), newNotification);
 /* ROUTES WITH FILES */
 app.post("/auth/register", userMiddleware, upload.single("picture"), register);
 app.post("/locations/newLocation", locationMiddleware, upload.single("picture"), newLocation);
-app.patch("/locations/:id", locationMiddleware, upload.single("file"), uploadFileLocation);
+app.patch("/locations/:id", setFileFolderLocation, upload.single("file"), uploadFileLocation);
 
 /* ROUTES */
 app.use("/auth", authRoutes);
