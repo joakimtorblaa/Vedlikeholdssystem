@@ -11,6 +11,16 @@ const FileListItem = (file) => {
     const { locationId } = useParams();
     const navigate = useNavigate();
 
+    const {
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        path,
+        destination,
+        filename,
+        size
+    } = file.fileInfo;
 
     const handleOpen = () => {
         setOpen(true);
@@ -56,7 +66,7 @@ const FileListItem = (file) => {
                 >
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Er du sikker på at du vil slette {file.fileInfo.originalname}?
+                            Er du sikker på at du vil slette {originalname}?
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
@@ -70,12 +80,12 @@ const FileListItem = (file) => {
                     padding="0"
                     onClick={(e) => {
                         e.preventDefault();
-                        window.location.href=`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/assets/locations/${file.fileInfo.filename}`
+                        window.location.href=`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}${path.slice(6)}`
                     }}
                 >
                     <ListItemText
-                        primary={file.fileInfo.originalname}
-                        secondary={convertDate(file.fileInfo.filename)}
+                        primary={originalname}
+                        secondary={convertDate(filename)}
                     />
                 </ListItemButton>
             </ListItem>

@@ -46,16 +46,24 @@ export const getTask = async (req, res) => {
 }
 
 export const getTasks = async (req, res) => {
-    
+    try {
+        const tasks = await Task.find();
+        res.status(200).json(tasks);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
 }
 
 export const getLocationTasks = async (req, res) => {
     try {
         const { id } = req.params;
         const task = await Task.find();
+
         const locationTasks = task.filter((task) => task.locationId === id);
 
-        res.status(200).json(locationTasks);
+        const nonDisabledTasks = locationTasks.filter((task) => task.disabled !== true);
+
+        res.status(200).json(nonDisabledTasks);
     } catch (err) {
         res.status(404).json({ message: err.message })
     }
@@ -107,6 +115,30 @@ export const addTaskComment = async (req, res) => {
         await task.save();
 
         res.status(201).json()
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
+export const getTaskComments = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const task = await Task.findById(id);
+
+        res.status(200).json(task.comments);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
+
+export const disableTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const task = await Task.findById(id);
+        task.disabled = true;
+        await task.save();
+
+        res.status(201).json(id + ' disabled');
     } catch (err) {
         res.status(409).json({ message: err.message });
     }

@@ -14,6 +14,7 @@ import AdminLocationWidget from "../../../widgets/AdminLocationWidget";
 import AdminTaskWidget from "../../../widgets/AdminTaskWidget";
 import FlexBetween from "../../../components/FlexBetween";
 import Clock from "../../../components/Clock";
+import NotificationComponent from "../../../components/NotificationComponent";
 
 const DashboardPage = () => {
     const dispatch = useDispatch();
@@ -50,9 +51,7 @@ const DashboardPage = () => {
                                 <IconButton>
                                     <Message />
                                 </IconButton>
-                                <IconButton>
-                                    <Notifications />
-                                </IconButton>
+                                <NotificationComponent />
                                 <IconButton>
                                     <Settings />
                                 </IconButton>
@@ -87,9 +86,7 @@ const DashboardPage = () => {
                                 <IconButton>
                                     <Message />
                                 </IconButton>
-                                <IconButton>
-                                    <Notifications />
-                                </IconButton>
+                                <NotificationComponent />
                                 <IconButton>
                                     <Settings />
                                 </IconButton>
@@ -119,9 +116,7 @@ const DashboardPage = () => {
                                 <IconButton>
                                     <Message />
                                 </IconButton>
-                                <IconButton>
-                                    <Notifications />
-                                </IconButton>
+                                <NotificationComponent />
                                 <IconButton>
                                     <Settings />
                                 </IconButton>

@@ -1,5 +1,5 @@
 import express from "express";
-import { getTask, getTasks, getLocationTasks, updateTask, addTaskComment } from "../controllers/task.js";
+import { getTask, getTasks, getLocationTasks, updateTask, addTaskComment, disableTask, getTaskComments } from "../controllers/task.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -8,8 +8,10 @@ const router = express.Router();
 router.get("/", verifyToken, getTasks);
 router.get("/:id", verifyToken, getTask);
 router.get("/locationId/:id", verifyToken, getLocationTasks);
+router.get("/:id/comments", verifyToken, getTaskComments);
 
 /* PATCH */
 router.patch("/:id/:status/:fullname", verifyToken, updateTask);
 router.patch("/:id/comments/:content/:postedBy", verifyToken, addTaskComment);
+router.patch("/:id/disabled", verifyToken, disableTask);
 export default router;

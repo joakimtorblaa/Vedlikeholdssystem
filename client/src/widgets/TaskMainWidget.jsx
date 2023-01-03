@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, IconButton, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, IconButton, List, ListItem, ListItemText, Pagination, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import FlexBetween from "../components/FlexBetween";
 import WidgetWrapper from "../components/WidgetWrapper";
@@ -10,8 +10,10 @@ import TaskStatusUpdate from "../components/TaskStatusUpdate";
 import TaskDelete from "../features/auth/TaskDeleteAuth";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Edit, PersonAdd, Settings, UploadFile } from "@mui/icons-material";
-import TaskCommentBox from "../components/TaskCommentBox";
+import { Edit, PersonAdd, UploadFile } from "@mui/icons-material";
+import TaskDisable from "../components/TaskDisable";
+import TaskComments from "../components/TaskComments";
+import { useEffect } from "react";
 
 const TaskMainWidget = (task) => {
     
@@ -38,6 +40,17 @@ const TaskMainWidget = (task) => {
     const historyList = history.map((item) => (
         JSON.parse(item)
     ));
+    
+    /* HANDLE PAGINATION */
+    const itemsPerPage = 5;
+    const [page, setPage] = useState(1);
+    let [noOfPages, setNoOfPages] = useState(1);
+    
+
+    const handlePage = (e, value) => {
+        //removing e breaks page function of Pagination
+        setPage(value)
+    }
 
     /* ADDING RECIEVERS OF NOTIFICATIONS */
     const user = useSelector((state) => state.user);
@@ -63,6 +76,10 @@ const TaskMainWidget = (task) => {
     const handleClose = () => {
         setOpen(false);
     }
+
+    useEffect(() => {
+        setNoOfPages(Math.ceil(historyList.length / itemsPerPage));
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     return (
@@ -131,7 +148,6 @@ const TaskMainWidget = (task) => {
                         </>
                     )}
                     
-                    
                 </Box>
                 
                 {/* Task controls */}
@@ -152,20 +168,18 @@ const TaskMainWidget = (task) => {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Avbryt</Button>
-                            <Button>
-                                Slett oppgave
-                            </Button>
+                            <TaskDisable/>
                         </DialogActions>
                     </Dialog>
                     <Typography
-                        variant="h2"
+                        variant="h3"
                         fontWeight="bold"
                     >
                         Oppgavekontroll
                     </Typography>
                     <Box>
                         <FlexBetween padding="1rem">
-                            <TaskStatusUpdate status={taskStatus}/>
+                            <TaskStatusUpdate status={taskStatus} users={users} task={taskName}/>
                         </FlexBetween>
                         <FlexBetween padding="1rem">
                             <Button variant="outlined" color="info">
@@ -182,7 +196,7 @@ const TaskMainWidget = (task) => {
                             <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
                         </FlexBetween>
                         <Box padding="1rem">
-                            <TaskCommentBox users={users} task={taskName} />
+                            
                         </Box>
                     </Box>
                     
@@ -192,7 +206,7 @@ const TaskMainWidget = (task) => {
                 {/* Task history */}
                 <Box sx={{gridRow: 2, gridColumn: "span 1"}}>
                     <Typography
-                        variant="h2"
+                        variant="h3"
                         fontWeight="bold"
                     >
                         Oppgavehistorikk
@@ -207,9 +221,30 @@ const TaskMainWidget = (task) => {
                             </ListItem>
                         ))}
                     </List>
+                    {historyList.length > 5 ? (
+                        <Pagination
+                            count={noOfPages}
+                            page={page}
+                            onChange={handlePage}
+                            defaultPage={1}
+                            color="primary"
+                            size="medium"
+                            showFirstButton
+                            showLastButton
+                        />
+                    ) : (
+                        <></>
+                    )}
                 </Box>
                 {/* Task comments */}
                 <Box sx={{gridRow: 2, gridColumn: "span 1"}}>
+                    <Typography
+                        variant="h3"
+                        fontWeight="bold"
+                    >
+                        Kommentarer
+                    </Typography>
+                    <TaskComments users={users} task={taskName} />
                 </Box>
             </Box>
         </WidgetWrapper>

@@ -1,4 +1,4 @@
-import { Badge, IconButton, ListItemText, Menu, MenuItem } from "@mui/material";
+import { Badge, IconButton, ListItemText, Menu, MenuItem, useTheme } from "@mui/material";
 import { Notifications } from "@mui/icons-material";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const NotificationComponent = () => {
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
+    const { palette } = useTheme();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifications, setNotifications] = useState(null);
@@ -72,12 +73,10 @@ const NotificationComponent = () => {
         return null;
     }
 
-    console.log(newNotifications);
     return (
         <>
          <IconButton
             onClick={handleClick}
-            sx={{ ml: 2 }}
             aria-controls={open ? 'notifications' : undefined}
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
@@ -127,20 +126,19 @@ const NotificationComponent = () => {
                 </MenuItem>
                 
             ) : (
-                notifications.map(item => (
+                notifications.slice(0).reverse().map(item => (
                     
                     item.opened === true ? (
-                    <MenuItem key={item._id} onClick={() => navigate(item.location)}>
-                        <ListItemText primary={item.content} secondary={item.createdAt} />
-                    </MenuItem> 
+                        <MenuItem key={item._id} onClick={() => navigate(item.location)}>
+                            <ListItemText primary={item.content} secondary={item.createdAt} />
+                        </MenuItem> 
                     ) : (
-                        <MenuItem key={item._id} onClick={() => setOpenedNotification(item._id, item.location)}>
-                        <ListItemText primary={item.content} secondary={item.createdAt} />
-                    </MenuItem>
+                        <MenuItem sx={{ backgroundColor: palette.background.alt}} key={item._id} onClick={() => setOpenedNotification(item._id, item.location)}>
+                            <ListItemText primary={item.content} secondary={item.createdAt} />
+                        </MenuItem>
                     )
                 ))
             )}
-
          </Menu>
         </>
     )

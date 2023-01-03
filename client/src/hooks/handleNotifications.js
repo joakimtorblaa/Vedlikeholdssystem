@@ -1,11 +1,5 @@
 const handleNotifications = (sender, content, reciever, location, token) => {
 
-    console.log(sender);
-    console.log(reciever);
-    console.log(content);
-    console.log(location);
-
-    
     const notification = async () => {
         const formData = new FormData();
         formData.append('sender', sender);
