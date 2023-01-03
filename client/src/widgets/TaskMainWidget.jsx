@@ -11,9 +11,10 @@ import TaskDelete from "../features/auth/TaskDeleteAuth";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Edit, PersonAdd, Settings, UploadFile } from "@mui/icons-material";
+import TaskCommentBox from "../components/TaskCommentBox";
 
 const TaskMainWidget = (task) => {
-    console.log(task.task);
+    
     const {
         _id,
         collaborators,
@@ -38,7 +39,22 @@ const TaskMainWidget = (task) => {
         JSON.parse(item)
     ));
 
+    /* ADDING RECIEVERS OF NOTIFICATIONS */
     const user = useSelector((state) => state.user);
+
+    let users = [];
+    if (userId !== user){
+        users.push(userId)
+    }
+    if (collaborators !== []) {
+        collaborators.map((item) => {
+            if (item !== user){
+                users.push(item)
+            }
+        })
+    }
+    /* ADDING RECIEVERS OF NOTIFICATIONS */
+
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => {
@@ -136,7 +152,7 @@ const TaskMainWidget = (task) => {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleClose}>Avbryt</Button>
-                            <Button >
+                            <Button>
                                 Slett oppgave
                             </Button>
                         </DialogActions>
@@ -149,8 +165,6 @@ const TaskMainWidget = (task) => {
                     </Typography>
                     <Box>
                         <FlexBetween padding="1rem">
-                            <TaskStatusUpdate status={taskStatus}/>
-                            <TaskStatusUpdate status={taskStatus}/>
                             <TaskStatusUpdate status={taskStatus}/>
                         </FlexBetween>
                         <FlexBetween padding="1rem">
@@ -167,6 +181,9 @@ const TaskMainWidget = (task) => {
                             </Button>
                             <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
                         </FlexBetween>
+                        <Box padding="1rem">
+                            <TaskCommentBox users={users} task={taskName} />
+                        </Box>
                     </Box>
                     
                     

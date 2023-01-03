@@ -23,7 +23,7 @@ const LocationWidget = (gridAdjust) => {
 
     useEffect(() => {
         getLocation();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [locationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!location) {
         return null;

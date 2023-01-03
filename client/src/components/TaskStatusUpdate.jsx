@@ -14,6 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
         const [changed, setChanged] = useState(true);
 
         const taskStatus = [
+            "Nylig opprettet",
             "Påbegynt",
             "Venter på svar",
             "Satt på vent",
@@ -33,8 +34,6 @@ import { useNavigate, useParams } from "react-router-dom";
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
                     }
-                    
-                    
                 });
             
             navigate(0);

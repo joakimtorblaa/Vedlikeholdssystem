@@ -12,9 +12,11 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import locationRoutes from "./routes/locations.js";
 import taskRoutes from "./routes/tasks.js";
+import notificationRoutes from "./routes/notifications.js";
 import { register } from "./controllers/auth.js";
 import { newLocation, uploadFileLocation } from "./controllers/locations.js";
 import { newTask } from "./controllers/task.js";
+import { newNotification } from "./controllers/notifications.js";
 
 /* CONFIGURATION */
 
@@ -60,6 +62,7 @@ const userMiddleware = (req, res, next) => {
 
 /* POST */
 app.post("/tasks/new", upload.none(), newTask);
+app.post("/notifications", upload.none(), newNotification);
 
 /* ROUTES WITH FILES */
 app.post("/auth/register", userMiddleware, upload.single("picture"), register);
@@ -71,6 +74,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/locations", locationRoutes);
 app.use("/tasks", taskRoutes);
+app.use("/notifications", notificationRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;

@@ -7,7 +7,8 @@ import {
     MenuItem,
     FormControl,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    Badge
 } from '@mui/material';
 import {
     Message,
@@ -22,9 +23,11 @@ import { setMode, setLogout } from '../../state';
 import { useNavigate } from 'react-router-dom';
 import FlexBetween from '../../components/FlexBetween';
 import AdminNavigate from '../../features/auth/AdminNavigateAuth';
+import NotificationComponent from '../../components/NotificationComponent';
 
 const Navbar = () => {
     const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user = useSelector((state) => state.fullName);
@@ -66,9 +69,7 @@ const Navbar = () => {
                     <IconButton>
                         <Message sx={{ fontSize: "25px" }} />
                     </IconButton>
-                    <IconButton onClick={() => navigate("/admin/dashboard")}>
-                        <Notifications sx={{ fontSize: "25px" }} />
-                    </IconButton>
+                    <NotificationComponent />
                     <AdminNavigate allowedRoles={'admin'} />
                         
                     <FormControl variant="standard" value={user}>

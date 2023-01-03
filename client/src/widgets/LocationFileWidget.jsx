@@ -62,7 +62,7 @@ const LocationFileWidget = (gridAdjust) => {
 
     useEffect(() => {
         getLocationFiles();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [locationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <WidgetWrapper sx={{gridRow: gridAdjust.gRow, gridColumn: gridAdjust.gColumn}}>

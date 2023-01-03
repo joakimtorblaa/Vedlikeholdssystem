@@ -18,7 +18,7 @@ import MapGL, { Marker } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Place } from '@mui/icons-material';
 import React, { useState } from 'react';
-const MAPBOX_TOKEN = "pk.eyJ1Ijoiam9ha2ltdG9yYmxhYSIsImEiOiJjbGJwODFyanowN3R1M3drZXhjd3dweTR3In0.41YDCZTQzuwNNi9BWUbRyw";
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const locationSchema = yup.object().shape({
     locationName: yup.string().required("Legg til lokasjonsnavn"),

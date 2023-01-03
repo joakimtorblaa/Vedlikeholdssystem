@@ -7,15 +7,14 @@ import TaskMainWidget from "../../widgets/TaskMainWidget";
 import Navbar from "../navbar";
 
 const TaskPage = () => {
-    const taskId = useParams();
+    const { taskid } = useParams(); 
     const token = useSelector((state) => state.token);
     const [task, setTask] = useState(null);
 
     const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-
     const getTask = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskId.taskid}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskid}`,
             {
                 method: "GET",
                 headers: {
@@ -30,7 +29,7 @@ const TaskPage = () => {
 
     useEffect(() => {
         getTask();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [taskid]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!task) {
         return null;

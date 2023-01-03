@@ -29,8 +29,6 @@ const TaskDelete = ({ allowedRoles, user, handleOpen }) => {
         return null;
     }
     
-    console.log(user)
-    
     const content = (roles.some(role => allowedRoles.includes(role)) || userId === user
         ?   <Button 
                 edge="end" 

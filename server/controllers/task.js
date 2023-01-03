@@ -87,3 +87,27 @@ export const updateTask = async (req, res) => {
         res.status(409).json({ message: err.message });
     }
 }
+
+export const addTaskComment = async (req, res) => {
+    try {
+        const { id, content, postedBy } = req.params;
+        const date = new Date();
+
+        const newComment = {
+            id : uuidv4(),
+            content : content,
+            postedBy : postedBy,
+            timestamp : date.getDate() +"/"+ (date.getMonth()+1) +"/" + date.getFullYear() + " - " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes()
+        }
+
+        const newCommentString = JSON.stringify(newComment);
+
+        const task = await Task.findById(id);
+        task.comments.push(newCommentString);
+        await task.save();
+
+        res.status(201).json()
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}

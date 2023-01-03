@@ -53,7 +53,7 @@ const LocationTaskWidget = (widgetAdjust) => {
 
     useEffect(() => {
         getLocationTasks();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [locationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <WidgetWrapper sx={{gridRow: widgetAdjust.gRow, gridColumn: widgetAdjust.gColumn}}>
