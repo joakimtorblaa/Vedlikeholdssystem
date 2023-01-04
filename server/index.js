@@ -15,9 +15,9 @@ import taskRoutes from "./routes/tasks.js";
 import notificationRoutes from "./routes/notifications.js";
 import { register } from "./controllers/auth.js";
 import { newLocation, uploadFileLocation } from "./controllers/locations.js";
-import { newTask } from "./controllers/task.js";
+import { newTask, uploadFileTask } from "./controllers/task.js";
 import { newNotification } from "./controllers/notifications.js";
-import { setFileFolderLocation } from "./middleware/filefolder.js";
+import { setFileFolderLocation, setFileFolderTask } from "./middleware/filefolder.js";
 import * as fs from 'fs';
 
 /* CONFIGURATION */
@@ -73,6 +73,7 @@ app.post("/notifications", upload.none(), newNotification);
 app.post("/auth/register", userMiddleware, upload.single("picture"), register);
 app.post("/locations/newLocation", locationMiddleware, upload.single("picture"), newLocation);
 app.patch("/locations/:id", setFileFolderLocation, upload.single("file"), uploadFileLocation);
+app.patch("/tasks/:id/newFile", setFileFolderTask, upload.single('file'), uploadFileTask)
 
 /* ROUTES */
 app.use("/auth", authRoutes);

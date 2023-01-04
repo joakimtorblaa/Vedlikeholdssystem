@@ -131,6 +131,21 @@ export const getTaskComments = async (req, res) => {
     }
 }
 
+export const uploadFileTask = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const task = await Task.findById(id);
+
+        task.taskFiles.push(req.file);
+        await task.save();
+
+        const newFile = task.taskFiles;
+        res.status(201).json(newFile);
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
 export const disableTask = async (req, res) => {
     try {
         const { id } = req.params;

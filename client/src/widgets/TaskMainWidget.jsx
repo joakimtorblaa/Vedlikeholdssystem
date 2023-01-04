@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, IconButton, List, ListItem, ListItemText, Pagination, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider, IconButton, List, ListItem, ListItemText, Pagination, Tab, Tabs, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import FlexBetween from "../components/FlexBetween";
 import WidgetWrapper from "../components/WidgetWrapper";
@@ -14,6 +14,7 @@ import { Edit, PersonAdd, UploadFile } from "@mui/icons-material";
 import TaskDisable from "../components/TaskDisable";
 import TaskComments from "../components/TaskComments";
 import { useEffect } from "react";
+import PropTypes from "prop-types";
 
 const TaskMainWidget = (task) => {
     
@@ -45,7 +46,6 @@ const TaskMainWidget = (task) => {
     const itemsPerPage = 5;
     const [page, setPage] = useState(1);
     let [noOfPages, setNoOfPages] = useState(1);
-    
 
     const handlePage = (e, value) => {
         //removing e breaks page function of Pagination
@@ -75,6 +75,44 @@ const TaskMainWidget = (task) => {
     }
     const handleClose = () => {
         setOpen(false);
+    }
+
+    /* HANDLE TABS */
+    const [value, setValue] = useState(0);
+
+    const handleTab = (e, newValue) => {
+        setValue(newValue)
+    }
+
+    const TabPanel = (props) => {
+        const { children, value, index, ...other } = props; 
+
+        return (
+            <Box
+                role="tabpanel"
+                hidden={value !== index}
+                id={`scrollable-auto-tabpanel-${index}`}
+                aria-labelledby={`scrollable-auto-tab-${index}`}
+                {...other}
+            >
+                <Box>
+                    {children}
+                </Box>
+            </Box>
+        )
+    }
+
+    TabPanel.propTypes = {
+        children: PropTypes.node,
+        index: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired
+    };
+
+    const a11yProps = (index) => {
+        return {
+          id: `scrollable-auto-tab-${index}`,
+          "aria-controls": `scrollable-auto-tabpanel-${index}`
+        };
     }
 
     useEffect(() => {
@@ -149,59 +187,67 @@ const TaskMainWidget = (task) => {
                     )}
                     
                 </Box>
-                
-                {/* Task controls */}
+                {/* Task comments */}
                 <Box sx={{gridRow: 1, gridColumn: "span 1"}}>
-                    <Dialog
-                        open={open}
-                        onClose={handleClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                    >
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                Er du sikker på at du vil slette denne oppgaven?
-                            </DialogContentText>
-                            <DialogContentText>
-                                Det er ingen vei tilbake når oppgaven først er slettet.
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleClose}>Avbryt</Button>
-                            <TaskDisable/>
-                        </DialogActions>
-                    </Dialog>
                     <Typography
                         variant="h3"
                         fontWeight="bold"
                     >
-                        Oppgavekontroll
+                        Kommentarer
                     </Typography>
+                    <TaskComments users={users} task={taskName} />
+                </Box>
+                {/* Task controls */}
+                <Box sx={{gridRow: 2, gridColumn: "span 1"}}>
                     <Box>
-                        <FlexBetween padding="1rem">
-                            <TaskStatusUpdate status={taskStatus} users={users} task={taskName}/>
-                        </FlexBetween>
-                        <FlexBetween padding="1rem">
-                            <Button variant="outlined" color="info">
-                                <PersonAdd /> legg til bruker
-                            </Button>
+                        <Tabs value={value} onChange={handleTab}>
+                            <Tab label="Oppgavefiler" {...a11yProps(0)}/>
+                            <Tab label="Oppgavekontroll" {...a11yProps(1)}/>
+                        </Tabs>
+                        <TabPanel value={value} index={0}>
+                            Test 2
+                        </TabPanel>
+                        <TabPanel value={value} index={1}>
+                            <Dialog
+                                open={open}
+                                onClose={handleClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        Er du sikker på at du vil slette denne oppgaven?
+                                    </DialogContentText>
+                                    <DialogContentText>
+                                        Det er ingen vei tilbake når oppgaven først er slettet.
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClose}>Avbryt</Button>
+                                    <TaskDisable/>
+                                </DialogActions>
+                            </Dialog>
+                            <Box>
+                                <FlexBetween padding="1rem">
+                                    <TaskStatusUpdate status={taskStatus} users={users} task={taskName}/>
+                                </FlexBetween>
+                                <FlexBetween padding="1rem">
+                                    <Button variant="outlined" color="info">
+                                        <PersonAdd /> legg til bruker
+                                    </Button>
 
-                            <Button variant="outlined" color="info">
-                                <UploadFile/> last opp fil
-                            </Button>
-                            
-                            <Button variant="outlined" color="info">
-                                <Edit/> endre oppgave
-                            </Button>
-                            <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
-                        </FlexBetween>
-                        <Box padding="1rem">
-                            
-                        </Box>
+                                    <Button variant="outlined" color="info">
+                                        <UploadFile/> last opp fil
+                                    </Button>
+                                    
+                                    <Button variant="outlined" color="info">
+                                        <Edit/> endre oppgave
+                                    </Button>
+                                    <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
+                                </FlexBetween>
+                            </Box>
+                        </TabPanel>
                     </Box>
-                    
-                    
-                    
                 </Box>
                 {/* Task history */}
                 <Box sx={{gridRow: 2, gridColumn: "span 1"}}>
@@ -235,16 +281,6 @@ const TaskMainWidget = (task) => {
                     ) : (
                         <></>
                     )}
-                </Box>
-                {/* Task comments */}
-                <Box sx={{gridRow: 2, gridColumn: "span 1"}}>
-                    <Typography
-                        variant="h3"
-                        fontWeight="bold"
-                    >
-                        Kommentarer
-                    </Typography>
-                    <TaskComments users={users} task={taskName} />
                 </Box>
             </Box>
         </WidgetWrapper>
