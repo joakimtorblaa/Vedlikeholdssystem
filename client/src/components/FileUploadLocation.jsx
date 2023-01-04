@@ -33,7 +33,7 @@ const FileUploadLocation = () => {
         }
         formData.append('filePath', values.file.name);
         const savedFileResponse = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}/newFile`,
             {
                 method: "PATCH",
                 body: formData

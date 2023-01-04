@@ -56,11 +56,19 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 const locationMiddleware = (req, res, next) => {
-    req.imagesFolder = 'location_headers';
+    let path = 'public/assets/locations/location_header/'
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path)
+    }
+    req.imagesFolder = 'locations/location_header';
     next();
 }
 
 const userMiddleware = (req, res, next) => {
+    let path = 'public/assets/users/'
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path)
+    }
     req.imagesFolder = 'users';
     next();
 }
@@ -72,7 +80,7 @@ app.post("/notifications", upload.none(), newNotification);
 /* ROUTES WITH FILES */
 app.post("/auth/register", userMiddleware, upload.single("picture"), register);
 app.post("/locations/newLocation", locationMiddleware, upload.single("picture"), newLocation);
-app.patch("/locations/:id", setFileFolderLocation, upload.single("file"), uploadFileLocation);
+app.patch("/locations/:id/newFile", setFileFolderLocation, upload.single("file"), uploadFileLocation);
 app.patch("/tasks/:id/newFile", setFileFolderTask, upload.single('file'), uploadFileTask)
 
 /* ROUTES */
