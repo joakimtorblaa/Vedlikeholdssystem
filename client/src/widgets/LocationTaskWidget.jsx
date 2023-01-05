@@ -13,7 +13,7 @@ const LocationTaskWidget = (widgetAdjust) => {
     const [open, setOpen] = useState(false);
     const [tasks, setTasks] = useState(null);
     const token = useSelector((state) => state.token);
-    const { locationId } = useParams();
+    const { id } = useParams();
 
     const itemsPerPage = 5;
     const [page, setPage] = useState(1);
@@ -34,7 +34,7 @@ const LocationTaskWidget = (widgetAdjust) => {
 
     const getLocationTasks = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/locationId/${locationId}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/locationId/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -46,14 +46,14 @@ const LocationTaskWidget = (widgetAdjust) => {
                 setTasks(null);
             } else {
                 const filteredData = data.filter((task) => task.completed === false);
-                setTasks(filteredData);
+                setTasks(filteredData.slice(0).reverse());
                 setNoOfPages(Math.ceil(filteredData.length / itemsPerPage ));
             }
     }
 
     useEffect(() => {
         getLocationTasks();
-    }, [locationId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <WidgetWrapper sx={{gridRow: widgetAdjust.gRow, gridColumn: widgetAdjust.gColumn}}>

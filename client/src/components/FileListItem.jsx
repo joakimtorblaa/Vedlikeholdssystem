@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, ListItem, ListItemButton, ListItemText, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,18 +8,13 @@ import FileDelete from "../features/auth/FileDeleteAuth";
 const FileListItem = (file) => {
     const [open, setOpen] = useState(false);
     const token = useSelector((state) => state.token);
-    const { locationId } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
 
     const {
-        fieldname,
         originalname,
-        encoding,
-        mimetype,
         path,
-        destination,
         filename,
-        size
     } = file.fileInfo;
 
     const handleOpen = () => {
@@ -37,10 +32,10 @@ const FileListItem = (file) => {
         return d.toLocaleString('no-NO');
     }
 
-    const deleteFile = async (e) => {
+    const deleteFile = async (index) => {
         // eslint-disable-next-line
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}/${e}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/${file.category}/${id}/${index}`,
             {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}`,
@@ -76,18 +71,20 @@ const FileListItem = (file) => {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                <ListItemButton
-                    padding="0"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        window.location.href=`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}${path.slice(6)}`
-                    }}
-                >
-                    <ListItemText
-                        primary={originalname}
-                        secondary={convertDate(filename)}
-                    />
-                </ListItemButton>
+                <Tooltip title={`Åpne fil i ny fane`} enterDelay={1000} leaveDelay={200}>
+                    <ListItemButton
+                        padding="0"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            window.open(`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}${path.slice(6)}`, '_blank')
+                        }}
+                    >
+                        <ListItemText
+                            primary={originalname}
+                            secondary={convertDate(filename)}
+                        />
+                    </ListItemButton>
+                </Tooltip>
             </ListItem>
         </>
     )

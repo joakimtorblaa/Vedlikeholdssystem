@@ -23,8 +23,9 @@ import FileListItem from "../components/FileListItem";
 const LocationFileWidget = (gridAdjust) => {
     const [open, setOpen] = useState(false);
     const [files, setFiles] = useState(null);
+    const [arrayCheck, setArrayCheck] = useState(null);
     const token = useSelector((state) => state.token);
-    const { locationId } = useParams();
+    const { id } = useParams();
 
     const itemsPerPage = 5;
     const [page, setPage] = useState(1);
@@ -42,11 +43,9 @@ const LocationFileWidget = (gridAdjust) => {
         setOpen(false);
     }
 
-    
-
     const getLocationFiles = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}/locationFiles`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${id}/locationFiles`,
             {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}`}
@@ -55,14 +54,19 @@ const LocationFileWidget = (gridAdjust) => {
             if (data.length <= 0) {
                 setFiles(null);
             } else {
-                setFiles(data);
+                setArrayCheck(data);
+                setFiles(data.slice(0).reverse());
                 setNoOfPages(Math.ceil(data.length / itemsPerPage));
             }        
     }
 
+    const findIndexInArray = (file) => {
+        return (arrayCheck.indexOf(file))
+    }
+
     useEffect(() => {
         getLocationFiles();
-    }, [locationId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <WidgetWrapper sx={{gridRow: gridAdjust.gRow, gridColumn: gridAdjust.gColumn}}>
@@ -108,10 +112,10 @@ const LocationFileWidget = (gridAdjust) => {
                     :
                     files
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-                    .map((file, index) =>(
-                        <FileListItem key={index} fileInfo={file} fileIndex={index}/>
+                    .map((file) =>(
+                        <FileListItem key={findIndexInArray(file)} fileInfo={file} fileIndex={findIndexInArray(file)} category="locations"/>
                     ))
-                }
+                    }
                     {/* FINN UT AV NEDLASTNING AV FIL LOGIKK OVER */}
                 </List>
                 <Box 

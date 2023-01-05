@@ -15,6 +15,7 @@ import AdminTaskWidget from "../../../widgets/AdminTaskWidget";
 import FlexBetween from "../../../components/FlexBetween";
 import Clock from "../../../components/Clock";
 import NotificationComponent from "../../../components/NotificationComponent";
+import { Helmet } from "react-helmet-async";
 
 const DashboardPage = () => {
     const dispatch = useDispatch();
@@ -28,6 +29,10 @@ const DashboardPage = () => {
 
     return (
         <Box>
+            <Helmet>
+                <title>Admin | Dashboard</title>
+                <meta name='description' content='Admin dashboard'/>
+            </Helmet>
             {isNarrowScreen ? (                  
                 <Box
                     display="grid"

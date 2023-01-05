@@ -18,6 +18,7 @@ import MapGL, { Marker } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Place } from '@mui/icons-material';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const locationSchema = yup.object().shape({
@@ -40,6 +41,8 @@ const initialLocationValues = {
 
 const LocationForm = () => {
     const { palette } = useTheme();
+
+    const navigate = useNavigate();
 
     const isNonMobile = useMediaQuery("(min-width: 600px)");
 
@@ -91,6 +94,7 @@ const LocationForm = () => {
 
         if (savedLocation) {
             console.log("Added new location");
+            navigate(`/task/${savedLocation._id}`);
         }
 
     }

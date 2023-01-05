@@ -1,4 +1,5 @@
 import{ Box, Typography, useTheme, useMediaQuery } from "@mui/material";
+import { Helmet } from "react-helmet-async";
 import Form from "./Form";
 
 const LoginPage = () => {
@@ -6,6 +7,10 @@ const LoginPage = () => {
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
     return (
         <Box>
+            <Helmet>
+                <title>Logg inn</title>
+                <meta name='description' content='Innloggingsside for Vedlikeholdssystem'/>
+            </Helmet>
             <Box
                 width="100%"
                 backgroundColor={theme.palette.background.alt}

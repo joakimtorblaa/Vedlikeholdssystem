@@ -131,6 +131,16 @@ export const getTaskComments = async (req, res) => {
     }
 }
 
+export const getTaskFiles = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const task = await Task.findById(id);
+        res.status(200).json(task.taskFiles);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
+
 export const uploadFileTask = async (req, res) => {
     try {
         const { id } = req.params;
@@ -140,6 +150,22 @@ export const uploadFileTask = async (req, res) => {
         await task.save();
 
         const newFile = task.taskFiles;
+        res.status(201).json(newFile);
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
+export const deleteTaskFile = async (req, res) => {
+    try {
+        const { id, fileIndex } = req.params;
+        const task = await Task.findById(id);
+
+        task.taskFiles.splice(fileIndex, 1);
+
+        await task.save();
+        const newFile = location.locationFiles;
+
         res.status(201).json(newFile);
     } catch (err) {
         res.status(409).json({ message: err.message });

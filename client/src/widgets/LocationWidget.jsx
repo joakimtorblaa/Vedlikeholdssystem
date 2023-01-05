@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import WidgetWrapper from "../components/WidgetWrapper";
@@ -8,11 +9,11 @@ const LocationWidget = (gridAdjust) => {
     const [location, setLocation] = useState(null);
     const token = useSelector((state) => state.token);
 
-    const { locationId } = useParams();
+    const { id } = useParams();
     
     const getLocation = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${id}`,
             {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}`}
@@ -23,7 +24,7 @@ const LocationWidget = (gridAdjust) => {
 
     useEffect(() => {
         getLocation();
-    }, [locationId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!location) {
         return null;
@@ -38,6 +39,10 @@ const LocationWidget = (gridAdjust) => {
 
     return (
         <WidgetWrapper sx={{gridRow: gridAdjust.gRow, gridColumn: gridAdjust.gColumn}}>
+             <Helmet>
+                <title>{locationName}</title>
+                <meta name='description' content={locationName}/>
+            </Helmet>
              <Box width="100%">
                     <Box>
                         <Typography

@@ -19,7 +19,7 @@ export const newLocation = async (req, res) => {
             coordsLat,
             coordsLng,
             locationFiles,
-            picturePath: 'locations/' + req.file.filename
+            picturePath: 'locations/location_header/' + req.file.filename
         }); 
         const savedLocation = await newLocation.save();
         res.status(201).json(savedLocation);
@@ -51,13 +51,8 @@ export const getLocations = async (req, res) => {
 export const getLocationFiles = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log("Test");
-        console.log(req.user);
         const location = await Location.findById(id);
-
-
         res.status(200).json(location.locationFiles);
-        
     } catch (err) {
         res.status(404).json({ message: err.message });
     }
@@ -82,8 +77,6 @@ export const deleteFileLocation = async (req, res) => {
     try {
         const { id, fileIndex } = req.params;
         const location = await Location.findById(id);
-        console.log(id);
-        console.log(fileIndex);
         
         location.locationFiles.splice(fileIndex, 1);
         

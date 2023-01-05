@@ -5,7 +5,7 @@ import TaskPage from "../../scenes/taskPage";
 
 const RequireTaskAuth = () => {
     const location = useLocation();
-    const taskId = useParams();
+    const { id } = useParams();
     const token = useSelector((state) => state.token);
     const user = useSelector((state) => state.user);
     const [task, setTask] = useState(null);
@@ -31,7 +31,7 @@ const RequireTaskAuth = () => {
 
     const getTask = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskId.taskid}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}`,
             {
                 method: "GET",
                 headers: {

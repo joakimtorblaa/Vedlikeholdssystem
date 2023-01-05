@@ -22,7 +22,7 @@ const initialFileValues = {
 
 const FileUploadLocation = () => {
     const { palette } = useTheme();
-    const { locationId } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
 
 
@@ -33,7 +33,7 @@ const FileUploadLocation = () => {
         }
         formData.append('filePath', values.file.name);
         const savedFileResponse = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${locationId}/newFile`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/locations/${id}/newFile`,
             {
                 method: "PATCH",
                 body: formData

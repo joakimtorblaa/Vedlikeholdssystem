@@ -1,4 +1,5 @@
 import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
+import { Helmet } from 'react-helmet-async';
 import Form from './Form';
 
 const RegisterPage = () => {
@@ -8,6 +9,10 @@ const RegisterPage = () => {
 
     return (
         <Box>
+            <Helmet>
+                <title>Admin | Opprett bruker</title>
+                <meta name='description' content='Admin - opprett ny bruker'/>
+            </Helmet>
             <Box
                 width={isNonMobileScreens ? "80%" : "93%"}
                 p="2rem"

@@ -1,4 +1,4 @@
-import { Box, List, Button, TextField, ListItemText, Pagination, Typography, Divider, ListItem } from "@mui/material";
+import { Box, List, Button, TextField, ListItemText, Pagination, Typography, ListItem } from "@mui/material";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -17,7 +17,7 @@ const initialCommentValues = {
 
 const TaskComments = (info) => {
 
-    const { taskid } = useParams();
+    const { id } = useParams();
     const fullName = useSelector((state) => state.fullName);
     const token = useSelector((state) => state.token);
     const [comments, setComments] = useState([]);
@@ -35,7 +35,7 @@ const TaskComments = (info) => {
         
         //eslint-disable-next-line
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskid}/comments/${values.comment}/${fullName}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/comments/${values.comment}/${fullName}`,
             {
                 method: "PATCH",
                 headers: {
@@ -47,7 +47,7 @@ const TaskComments = (info) => {
         onSubmitProps.resetForm();
         getTaskComments();
         for (let user in info.users) {
-            handleNotifications(fullName, `${fullName} la til en kommentar på ${info.task}.`, info.users[user], `/task/${taskid}`, token);
+            handleNotifications(fullName, `${fullName} la til en kommentar på ${info.task}.`, info.users[user], `/task/${id}`, token);
         }
     }
 
@@ -57,7 +57,7 @@ const TaskComments = (info) => {
 
     const getTaskComments = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskid}/comments`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/comments`,
             {
                 method: "GET",
                 headers: {
@@ -76,6 +76,10 @@ const TaskComments = (info) => {
     useEffect(() => {
         getTaskComments();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (!comments) {
+        return null;
+    }
 
     return (
         <Box padding="0 1rem">

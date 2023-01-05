@@ -3,14 +3,14 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 const TaskDisable = () => {
-    const { taskid } = useParams();
+    const { id } = useParams();
     const token = useSelector((state) => state.token);
     const navigate = useNavigate();
 
     const disableTask = async () => {
         //eslint-disable-next-line
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskid}/disabled`, 
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/disabled`, 
             {
                 method: "PATCH",
                 headers: {

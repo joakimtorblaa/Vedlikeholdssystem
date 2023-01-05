@@ -8,7 +8,7 @@ import handleNotifications from "../hooks/handleNotifications";
     
     const TaskStatusUpdate = (info) => {
         const navigate = useNavigate();
-        const { taskid } = useParams();
+        const { id } = useParams();
         const token = useSelector((state) => state.token);
         const fullName = useSelector((state) => state.fullName);
         const [currentStatus, setCurrentStatus] = useState(info.status);
@@ -28,7 +28,7 @@ import handleNotifications from "../hooks/handleNotifications";
 
             // eslint-disable-next-line
             const response = await fetch(
-                `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${taskid}/${currentStatus}/${fullName}`,
+                `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/${currentStatus}/${fullName}`,
                 {
                     method: "PATCH",
                     headers: { 
@@ -38,7 +38,7 @@ import handleNotifications from "../hooks/handleNotifications";
                 }
             );
             for (let user in info.users) {
-                handleNotifications(fullName, `${fullName} endret status på ${info.task} til ${currentStatus}.`, info.users[user], `/task/${taskid}`, token);
+                handleNotifications(fullName, `${fullName} endret status på ${info.task} til ${currentStatus}.`, info.users[user], `/task/${id}`, token);
             }
             navigate(0);
 
