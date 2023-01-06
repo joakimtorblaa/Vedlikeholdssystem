@@ -71,7 +71,7 @@ const TaskControlWidget = (task) => {
                     </FlexBetween>
                         <Box padding="1rem 0">
                             <FlexBetween>
-                                <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators}/>
+                                <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName}/>
                                 <TaskRemoveColab allowedRoles={'admin'} user={userId}/>
                                 <TaskEdit allowedRoles={'admin'} user={userId}/>
                                 <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />

@@ -1,15 +1,17 @@
-import { Button, ListItemText, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Button, ListItemText, MenuItem, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { Formik } from "formik"
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import handleNotifications from "../hooks/handleNotifications";
 
-const TaskAddColabForm = ({currentUsers, createdBy}) => {
+const TaskAddColabForm = ({currentUsers, createdBy, taskName}) => {
 
     const { id } = useParams();
     const userId = useSelector((state) => state.user);
     const token = useSelector((state) => state.token)
+    const fullName = useSelector((state) => state.fullName);
+    const navigate = useNavigate();
     const [collaborator, setCollaborator] = useState([]);
     const [users, setUsers] = useState([]);
     const [changed, setChanged] = useState(true);
@@ -31,6 +33,10 @@ const TaskAddColabForm = ({currentUsers, createdBy}) => {
                     }
                 }
             )
+            for (let item in collaborator) {
+                handleNotifications(fullName, `${fullName} har lagt deg til ${taskName}.`, collaborator[item], `/task/${id}`, token);
+            }
+            navigate(0);
         }      
     }
 

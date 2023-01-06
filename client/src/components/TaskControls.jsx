@@ -39,13 +39,12 @@ const TaskDisable = () => {
 }
 
 
-const TaskAddColab = ({allowedRoles, user, currentUsers}) => {
+const TaskAddColab = ({allowedRoles, user, currentUsers, taskName}) => {
     const token = useSelector((state) => state.token);
     const userId = useSelector((state) => state.user);
     
     const [roles, setRoles] = useState(null);
     const [open, setOpen] = useState(false);
-    const [changed, setChanged] = useState(true);
 
     const handleOpen = () => {
         setOpen(true);
@@ -87,7 +86,7 @@ const TaskAddColab = ({allowedRoles, user, currentUsers}) => {
                     <IconButton onClick={handleClose}>
                         <Close />
                     </IconButton>
-                    <TaskAddColabForm currentUsers={currentUsers} createdBy={user}/>
+                    <TaskAddColabForm currentUsers={currentUsers} createdBy={user} taskName={taskName}/>
                 </DialogContent>
             </Dialog>
             <Button variant="outlined" color="info" onClick={handleOpen}>

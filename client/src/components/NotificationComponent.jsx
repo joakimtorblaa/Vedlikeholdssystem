@@ -62,8 +62,14 @@ const NotificationComponent = () => {
         if (patchedNotification) {
             setNewNotifications(newNotifications-1);
             navigate(location);
+            handleClose();
         }
     }
+
+    const openNotification = (location) => {
+        navigate(location);
+        handleClose();
+    } 
 
     useEffect(() => {
         getUserNotifications();
@@ -129,7 +135,7 @@ const NotificationComponent = () => {
                 notifications.slice(0).reverse().map(item => (
                     
                     item.opened === true ? (
-                        <MenuItem key={item._id} onClick={() => navigate(item.location)}>
+                        <MenuItem key={item._id} onClick={() => openNotification(item.location)}>
                             <ListItemText primary={item.content} secondary={item.createdAt} />
                         </MenuItem> 
                     ) : (
