@@ -6,4 +6,4 @@ Applikasjon for fordeling av oppgaver og tilgang til dokumentasjon relatert til 
 Bygget med Mongoose, Express, React, Node (MERN stack).
 
 ## Prosjektstatus
-Nåværende status for prosjektet er: planlegging av databaser og innhold/oppsett til applikasjonen.
+Nåværende status for prosjektet er: programmering av oppgavefunksjoner
