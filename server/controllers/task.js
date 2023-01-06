@@ -14,7 +14,10 @@ export const newTask = async (req, res) => {
             deadline
         } = req.body;
 
-        const splitColabs = req.body.collaborators.split(",");
+        let splitColabs = []
+        if (req.body.collaborators.length > 0) {
+            splitColabs = req.body.collaborators.split(",");
+        }
 
         const newTask = new Task ({
             taskName,
@@ -114,9 +117,27 @@ export const addTaskComment = async (req, res) => {
         task.comments.push(newCommentString);
         await task.save();
 
-        res.status(201).json()
+        res.status(201).json('Added comment to task')
     } catch (err) {
         res.status(409).json({ message: err.message });
+    }
+}
+
+export const addTaskCollaborator = async (req, res) => {
+    try {
+        const { id, collaborators } = req.params;
+        console.log('test');
+        const parsedCollaborators = JSON.parse(collaborators);
+        console.log(parsedCollaborators);
+        const task = await Task.findById(id);
+        for (let item in parsedCollaborators) {
+            task.collaborators.push(parsedCollaborators[item])
+        }
+        await task.save();
+
+        res.status(201).json('Added collaborator/s to task')
+    } catch (err) {
+        res.status(409).json({ message: err.message })
     }
 }
 
@@ -143,9 +164,18 @@ export const getTaskFiles = async (req, res) => {
 
 export const uploadFileTask = async (req, res) => {
     try {
-        const { id } = req.params;
-        const task = await Task.findById(id);
+        const { id, fullname } = req.params;
+        const date = new Date();
+        
+        const newHistory = {
+            id : uuidv4(),
+            content : `${fullname} lastet opp ${req.file.originalname}`,
+            timestamp : date.getDate() +"/"+ (date.getMonth()+1) +"/" + date.getFullYear() + " - " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(),
+        }
+        const newHistoryString = JSON.stringify(newHistory);
 
+        const task = await Task.findById(id);
+        task.history.push(newHistoryString);
         task.taskFiles.push(req.file);
         await task.save();
 

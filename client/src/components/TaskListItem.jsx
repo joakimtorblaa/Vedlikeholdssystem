@@ -8,7 +8,6 @@ import UserComponent from "./UserComponent";
 
 const TaskListItem = (task) => {
     const [open, setOpen] = useState(false);
-    
     const handleOpen = () => {
         setOpen(true);
     }
@@ -57,15 +56,17 @@ const TaskListItem = (task) => {
                                 </Typography>
                                 <UserComponent createdBy={task.taskInfo.userId}/>
                                 
-                                {task.taskInfo.collaborators[0].length !== 0 ? (
+                                {task.taskInfo.collaborators.length === 0 ? (
+                                    <Typography>
+                                        Ingen tilknyttede brukere
+                                    </Typography>
+                                ) : (
                                     <Box>
                                         <Typography>
-                                        Tilknyttede brukere
+                                            Tilknyttede brukere
                                         </Typography>
                                         <Collaborators collaborator={task.taskInfo.collaborators}/>
                                     </Box>
-                                ) : (
-                                    <></>
                                 )}
                                 
                                 

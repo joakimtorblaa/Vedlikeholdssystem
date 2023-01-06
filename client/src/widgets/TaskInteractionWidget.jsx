@@ -10,6 +10,7 @@ const TaskInteractionWidget = (task) => {
 
     const {
         taskName,
+        taskStatus,
         userId,
         collaborators
     } = task.task;
@@ -75,10 +76,10 @@ const TaskInteractionWidget = (task) => {
                 <Tab label="Filer" {...a11yProps(1)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
-                <TaskComments users={users} task={taskName}/>
+                <TaskComments users={users} task={taskName} status={taskStatus}/>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <FileListTask />
+                <FileListTask users={users} task={taskName} status={taskStatus}/>
             </TabPanel>
         </Box>
     )

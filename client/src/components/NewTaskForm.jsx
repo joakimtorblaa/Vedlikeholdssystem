@@ -45,7 +45,7 @@ const NewTaskForm = () => {
     const userId = useSelector((state) => state.user);
     const fullName = useSelector((state) => state.fullName);
     const token = useSelector((state) => state.token);
-    const locationId = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [collaborator, setCollaborator] = useState([]);
     const [users, setUsers] = useState();
@@ -72,7 +72,7 @@ const NewTaskForm = () => {
             formData.append(value, values[value])
         }
         formData.append('collaborators', collaborator);
-        formData.append('locationId', locationId.locationId);
+        formData.append('locationId', id);
         formData.append('createdBy', fullName);
         formData.append('userId', userId);
         formData.append('history', JSON.stringify(taskHistory));

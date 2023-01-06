@@ -12,8 +12,9 @@ const RequireTaskAuth = () => {
     const [isAuth, setIsAuth] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    const getUserType = async () => {
-        const response = await fetch(
+
+    const getTaskAndType = async () => {
+        const responseType = await fetch(
             `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/users/${user}/userType`,
             {
                 method: "GET",
@@ -22,14 +23,11 @@ const RequireTaskAuth = () => {
                 }
             }
         )
-        const data = await response.json();
-        if (data === 'admin') {
+        const dataType = await responseType.json();
+        if (dataType === 'admin') {
             setIsAdmin(true);
         }
 
-    }
-
-    const getTask = async () => {
         const response = await fetch(
             `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}`,
             {
@@ -57,19 +55,21 @@ const RequireTaskAuth = () => {
     }
 
     useEffect(() => {
-        getUserType();
-        getTask();
+        getTaskAndType();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!task) {
         return null;
     }
     
-    const content = (isAuth === true || isAdmin === true
-    ? <TaskPage /> 
-    : <Navigate to="/home" state={{ from: location }} replace />
-    )
+    const content = (isAdmin === true || isAuth === true 
+        ? <TaskPage /> 
+        : <Navigate to="/home" state={{ from: location }} replace />
+        )
+
     return content;
+    
+    
 }
 
 export default RequireTaskAuth;

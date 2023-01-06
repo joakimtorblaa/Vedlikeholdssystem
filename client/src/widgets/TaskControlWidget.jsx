@@ -4,9 +4,10 @@ import { Box } from "@mui/system";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import FlexBetween from "../components/FlexBetween";
-import TaskDisable from "../components/TaskDisable";
+import { TaskAddColab, TaskDisable, TaskEdit, TaskRemoveColab } from "../components/TaskControls";
 import TaskStatusUpdate from "../components/TaskStatusUpdate";
 import TaskDelete from "../features/auth/TaskDeleteAuth";
+import taskCompleted from "../hooks/taskCompleted";
 
 const TaskControlWidget = (task) => {
 
@@ -63,25 +64,21 @@ const TaskControlWidget = (task) => {
                     <TaskDisable/>
                 </DialogActions>
             </Dialog>
-            <Box>
-                <FlexBetween>
-                    <TaskStatusUpdate status={taskStatus} users={users} task={taskName}/>
-                </FlexBetween>
-                <FlexBetween padding="1rem 0">
-                    <Button variant="outlined" color="info">
-                        <PersonAdd /> legg til bruker
-                    </Button>
-
-                    <Button variant="outlined" color="info">
-                        <UploadFile/> last opp fil
-                    </Button>
-                    
-                    <Button variant="outlined" color="info">
-                        <Edit/> endre oppgave
-                    </Button>
-                    <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
-                </FlexBetween>
-            </Box>
+            {taskCompleted(taskStatus) ? <><TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} /></> :
+                <Box>
+                    <FlexBetween>
+                        <TaskStatusUpdate status={taskStatus} users={users} task={taskName}/>
+                    </FlexBetween>
+                        <Box padding="1rem 0">
+                            <FlexBetween>
+                                <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators}/>
+                                <TaskRemoveColab allowedRoles={'admin'} user={userId}/>
+                                <TaskEdit allowedRoles={'admin'} user={userId}/>
+                                <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
+                            </FlexBetween>
+                        </Box>
+                </Box>
+            }
         </Box>
     )
 }

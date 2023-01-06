@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 const TaskHistoryWidget = (task) => {
 
+    const [list, setList] = useState([]);
+
     const {
         history
     } = task.task;
@@ -23,6 +25,7 @@ const TaskHistoryWidget = (task) => {
     }
 
     useEffect(() => {
+        setList(history.slice(0).reverse())
         setNoOfPages(Math.ceil(historyList.length / itemsPerPage));
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -35,7 +38,9 @@ const TaskHistoryWidget = (task) => {
                     Oppgavehistorikk
                 </Typography>
                 <List>
-                    {historyList.reverse().map((item) => (
+                    {historyList
+                    .slice((page - 1) * itemsPerPage, page * itemsPerPage)
+                    .map((item) => (
                         <ListItem key={item.id}>
                             <ListItemText 
                                 primary={item.content}
@@ -45,16 +50,21 @@ const TaskHistoryWidget = (task) => {
                     ))}
                 </List>
                 {historyList.length > 5 ? (
-                    <Pagination
-                        count={noOfPages}
-                        page={page}
-                        onChange={handlePage}
-                        defaultPage={1}
-                        color="primary"
-                        size="medium"
-                        showFirstButton
-                        showLastButton
-                    />
+                    <Box 
+                        display="flex"
+                        justifyContent="center"
+                    >
+                        <Pagination 
+                            count={noOfPages}
+                            page={page}
+                            onChange={handlePage}
+                            defaultPage={1}
+                            color="primary"
+                            size="medium"
+                            showFirstButton
+                            showLastButton
+                        />
+                    </Box>
                 ) : (
                     <></>
                 )}

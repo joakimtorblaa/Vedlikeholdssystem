@@ -46,7 +46,7 @@ const TaskMainWidget = (task) => {
                 variant="h1"
                 fontWeight="bold"
             >
-            {taskName}
+                {taskName}
             </Typography>
             <Typography
                 variant="h3"
@@ -83,7 +83,9 @@ const TaskMainWidget = (task) => {
             <Box width="50%">
                 <UserComponent createdBy={userId}/>
             </Box>
-            {collaborators[0].length > 0 ? (
+            {collaborators.length === 0 ? (
+                <></>
+            ) : (
                 <Box width="50%">
                     <Typography
                         padding="5px 0"
@@ -93,9 +95,6 @@ const TaskMainWidget = (task) => {
                     </Typography>
                     <Collaborators collaborator={collaborators}/>
                 </Box>
-            ) : (
-                <>
-                </>
             )}
         </Box>
     )

@@ -81,7 +81,7 @@ app.post("/notifications", upload.none(), newNotification);
 app.post("/auth/register", userMiddleware, upload.single("picture"), register);
 app.post("/locations/newLocation", locationMiddleware, upload.single("picture"), newLocation);
 app.patch("/locations/:id/newFile", setFileFolderLocation, upload.single("file"), uploadFileLocation);
-app.patch("/tasks/:id/newFile", setFileFolderTask, upload.single('file'), uploadFileTask);
+app.patch("/tasks/:id/newFile/:fullname", setFileFolderTask, upload.single('file'), uploadFileTask);
 
 /* ROUTES */
 app.use("/auth", authRoutes);

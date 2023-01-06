@@ -14,15 +14,16 @@ import {
     useTheme,
 } from '@mui/material'
 import { Close, EditOutlined, UploadFile } from '@mui/icons-material';
-import { Formik } from 'formik';
-import * as yup from 'yup';
-
-import Dropzone from 'react-dropzone';
 import { useParams } from 'react-router-dom';
-import FlexBetween from './FlexBetween';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Formik } from 'formik';
+import * as yup from 'yup';
+import Dropzone from 'react-dropzone';
 import FileListItem from './FileListItem';
+import FlexBetween from './FlexBetween';
+import handleNotifications from '../hooks/handleNotifications';
+import taskCompleted from '../hooks/taskCompleted';
 
 const fileSchema = yup.object().shape({
     file: yup.string().required()
@@ -32,13 +33,15 @@ const initialFileValues = {
     file: ""
 }
 
-const FileListTask = () => {
+const FileListTask = (info) => {
     const { palette } = useTheme();
     const { id } = useParams();
     const [open, setOpen] = useState(false);
     const [files, setFiles] = useState(null);
+    const [showPages, setShowPages] = useState(false);
     const [arrayCheck, setArrayCheck] = useState(null);
     const token = useSelector((state) => state.token);
+    const fullName = useSelector((state) => state.fullName);
 
     const itemsPerPage = 5;
     const [page, setPage] = useState(1);
@@ -63,7 +66,7 @@ const FileListTask = () => {
         }
         formData.append('filePath', values.file.name);
         const savedFileResponse = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/newFile`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/newFile/${fullName}`,
             {
                 method: "PATCH",
                 body: formData
@@ -73,7 +76,11 @@ const FileListTask = () => {
         onSubmitProps.resetForm();
     
         if(savedFile) {
-            console.log("Added new file to task"); 
+            console.log("Added new file to task");
+            for (let user in info.users) {
+                handleNotifications(fullName, `${fullName} lastet opp en fil på ${info.task}.`, info.users[user], `/task/${id}`, token)
+            }
+            
             getTaskFiles();
             handleClose();
         }
@@ -92,6 +99,9 @@ const FileListTask = () => {
             } else {
                 setArrayCheck(data);
                 setFiles(data.slice(0).reverse());
+                if (data.length > 5) {
+                    setShowPages(true);
+                }
                 setNoOfPages(Math.ceil(data.length / itemsPerPage));
             }        
     }
@@ -99,15 +109,11 @@ const FileListTask = () => {
     const findIndexInArray = (file) => {
         return (arrayCheck.indexOf(file))
     }
-
     useEffect(() => {
         getTaskFiles();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    if (!files) {
-        return null;
-    }
-
+    
     const handleFormSubmit = async(values, onSubmitProps) => {
         await uploadFileTask(values, onSubmitProps);
     }
@@ -191,24 +197,41 @@ const FileListTask = () => {
                 </DialogContent>
             </Dialog>
             <List>
-                {files ? 
-                <Box>
-                    
-                    <ListItem
-                        secondaryAction={
-                            <IconButton edge="end" aria-label="uploadfile" onClick={handleOpen}>
-                                <UploadFile />
-                            </IconButton>
-                        }
-                    >
+                {/* HANDLE TASKCOMPLETED FOR TASK FILES */}
+                {files && !taskCompleted(info.status) ? 
+                    <Box>
+                        
+                        <ListItem
+                            secondaryAction={
+                                <IconButton edge="end" aria-label="uploadfile" onClick={handleOpen}>
+                                    <UploadFile />
+                                </IconButton>
+                            }
+                        >
+                            <Typography
+                                fontWeight="bold"
+                            >
+                                Oppgavefiler
+                            </Typography>
+                        </ListItem>
+                        <Divider />
+                    </Box>
+                : files && taskCompleted(info.status) ?
+                    <ListItem>
                         <Typography
                             fontWeight="bold"
                         >
                             Oppgavefiler
                         </Typography>
                     </ListItem>
-                    <Divider />
-                </Box>
+                : !files && taskCompleted(info.status) ? 
+                    <ListItem>
+                        <Typography
+                            fontWeight="bold"
+                        >
+                            Ingen filer funnet.
+                        </Typography>
+                    </ListItem>
                 :
                     <ListItem
                         secondaryAction={
@@ -222,7 +245,7 @@ const FileListTask = () => {
                         >
                             Ingen filer funnet. Klikk på ikonet til høyre for å laste opp.
                         </Typography>
-                    </ListItem>
+                    </ListItem>  
                 }
                 {!files ?
                     <></>
@@ -233,21 +256,26 @@ const FileListTask = () => {
                         <FileListItem key={findIndexInArray(file)} fileInfo={file} fileIndex={findIndexInArray(file)} category="tasks"/>
                     ))
                 }
-                <Box 
-                    display="flex"
-                    justifyContent="center"
-                >
-                    <Pagination 
-                        count={noOfPages}
-                        page={page}
-                        onChange={handlePage}
-                        defaultPage={1}
-                        color="primary"
-                        size="medium"
-                        showFirstButton
-                        showLastButton
-                    />
-                </Box>
+                {showPages ?
+                    <Box 
+                        display="flex"
+                        justifyContent="center"
+                    >
+                        <Pagination 
+                            count={noOfPages}
+                            page={page}
+                            onChange={handlePage}
+                            defaultPage={1}
+                            color="primary"
+                            size="medium"
+                            showFirstButton
+                            showLastButton
+                        />
+                    </Box>
+                : 
+                <></>
+                }
+                
             </List>
         </Box>
     )

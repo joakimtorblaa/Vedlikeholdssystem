@@ -3,14 +3,19 @@ const accessControl = ( type ) => {
 
     let isUser = null;
     let isAdmin = null;
+    let isCreator = null;
     
     if (token) {
         
         let roles = [];
 
-        token === 'admin' ? isAdmin = token : isUser = token;
+        token === 'admin' 
+            ? isAdmin = token 
+            : token === 'creator' 
+            ? isCreator = token
+            : isUser = token;
         
-        roles = [ isAdmin, isUser ];
+        roles = [ isAdmin, isCreator, isUser ];
 
         return roles; 
     }

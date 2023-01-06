@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from 'yup';
 import handleNotifications from "../hooks/handleNotifications";
+import taskCompleted from "../hooks/taskCompleted";
 
 const commentSchema = yup.object().shape({
     comment: yup.string().max(255).required("Legg til kommentar"),
@@ -115,43 +116,46 @@ const TaskComments = (info) => {
                     
                 </Box>
             </Box>
-            <Box>
+            {taskCompleted(info.status) ? <></> :
+                <Box>
                 <Formik
-                onSubmit={handleFormSubmit}
-                initialValues={initialCommentValues}
-                validationSchema={commentSchema}
-            >
-                {({
-                    values,
-                    errors,
-                    touched,
-                    handleBlur,
-                    handleChange,
-                    handleSubmit,
-                    setFieldValue,
-                }) => (
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            fullWidth
-                            label="Kommentar"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.comment}
-                            name="comment"
-                            error={Boolean(touched.comment) && Boolean(errors.comment)}
-                            helperText={touched.comment && errors.comment}
-                            inputProps={{ maxLength: 255 }}
-                        />
-                        <Typography>
-                            Gjenstående karakterer: {255 - (values.comment.length) }
-                        </Typography>
-                        <Button type="submit"> 
-                            Legg til kommentar
-                        </Button>
-                    </form>
-                )}
-                </Formik>
-            </Box>
+                    onSubmit={handleFormSubmit}
+                    initialValues={initialCommentValues}
+                    validationSchema={commentSchema}
+                >
+                    {({
+                        values,
+                        errors,
+                        touched,
+                        handleBlur,
+                        handleChange,
+                        handleSubmit,
+                        setFieldValue,
+                    }) => (
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                                fullWidth
+                                label="Kommentar"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.comment}
+                                name="comment"
+                                error={Boolean(touched.comment) && Boolean(errors.comment)}
+                                helperText={touched.comment && errors.comment}
+                                inputProps={{ maxLength: 255 }}
+                            />
+                            <Typography>
+                                Gjenstående karakterer: {255 - (values.comment.length)}
+                            </Typography>
+                            <Button type="submit"> 
+                                Legg til kommentar
+                            </Button>
+                        </form>
+                    )}
+                    </Formik>
+                </Box>
+            }
+            
         </Box>
     )
 }
