@@ -2,17 +2,20 @@ import { useTheme } from "@emotion/react";
 import { Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
 import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
+import titleNotifications from "../../../../hooks/titleNotifications";
 import LocationForm from "../newLocationPage/Form";
 
 
 const NewLocationPage = () => {
+    const notifications = useSelector((state) => state.notifications);
     const theme = useTheme();
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
     return (
         <Box>
             <Helmet>
-                <title>Admin | Opprett ny lokasjon</title>
+                <title>{titleNotifications(notifications)}Admin | Opprett ny lokasjon</title>
                 <meta name='description' content='Admin - Oppretting av ny lokasjon'/>
             </Helmet>
             <Box

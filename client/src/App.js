@@ -17,6 +17,7 @@ import NewLocationPage from './scenes/adminPage/locationPage/newLocationPage';
 import TasksPage from './scenes/tasksPage';
 import RequireTaskAuth from './features/auth/RequireTaskAuth';
 import { HelmetProvider } from 'react-helmet-async';
+import NotificationPage from './scenes/notificationPage';
 
 
 
@@ -51,7 +52,6 @@ function App() {
                 path="/locations/:id"
                 element={isAuth ? <LocationPage /> : <Navigate to="/" />}
               />
-
               <Route 
                 path="/tasks"
                 element={isAuth ? <TasksPage /> : <Navigate to="/" />}
@@ -59,6 +59,10 @@ function App() {
               <Route
                 path="/task/:id"
                 element={isAuth ? <RequireTaskAuth /> : <Navigate to="/" />}
+              />
+              <Route 
+                path="/notifications"
+                element={isAuth ? <NotificationPage /> : <Navigate to="/" />}
               />
               
               <Route element={isAuth ? <RequireAdminAuth allowedRoles={'admin'} /> : <Navigate to="/"/>}>

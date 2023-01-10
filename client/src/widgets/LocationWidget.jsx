@@ -4,10 +4,12 @@ import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import WidgetWrapper from "../components/WidgetWrapper";
+import titleNotifications from "../hooks/titleNotifications";
 
 const LocationWidget = (gridAdjust) => {
     const [location, setLocation] = useState(null);
     const token = useSelector((state) => state.token);
+    const notifications = useSelector((state) => state.notifications);
 
     const { id } = useParams();
     
@@ -40,7 +42,7 @@ const LocationWidget = (gridAdjust) => {
     return (
         <WidgetWrapper sx={{gridRow: gridAdjust.gRow, gridColumn: gridAdjust.gColumn}}>
              <Helmet>
-                <title>{locationName}</title>
+                <title>{titleNotifications(notifications)}{locationName}</title>
                 <meta name='description' content={locationName}/>
             </Helmet>
              <Box width="100%">

@@ -2,17 +2,21 @@ import { Badge, IconButton, ListItemText, Menu, MenuItem, useTheme } from "@mui/
 import { Notifications } from "@mui/icons-material";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { setUnreadNotifications } from '../state';
 
 const NotificationComponent = () => {
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
+    const unreadNotifications = useSelector((state) => state.notifications);
     const { palette } = useTheme();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifications, setNotifications] = useState(null);
-    const [newNotifications, setNewNotifications] = useState(0);
+    const location = useLocation();
+    const [locationPath, setLocationPath] = useState(false);
     const open = Boolean(anchorEl);
 
     const handleClick = (e) => {
@@ -35,14 +39,16 @@ const NotificationComponent = () => {
         );
         const fetchedNotifications = await response.json();
         if (fetchedNotifications) {
-            setNotifications(fetchedNotifications);
+            setNotifications(fetchedNotifications.slice(0).reverse());
             let totalNotifications = 0;
             for (let item in fetchedNotifications) {
                 if (fetchedNotifications[item].opened === false) {
                     totalNotifications++;
                 }
             }
-            setNewNotifications(totalNotifications);
+            dispatch(
+                setUnreadNotifications({notifications: totalNotifications})
+            );
         } else {
             setNotifications(null);
         }
@@ -60,7 +66,10 @@ const NotificationComponent = () => {
         )
         const patchedNotification = await response.json();
         if (patchedNotification) {
-            setNewNotifications(newNotifications-1);
+
+            dispatch(
+                setUnreadNotifications({notifications: unreadNotifications-1})
+            )
             navigate(location);
             handleClose();
         }
@@ -70,13 +79,36 @@ const NotificationComponent = () => {
         navigate(location);
         handleClose();
     } 
+    
+    const getLocationAndLoadNotifications = () => {
+        console.log(location.pathname === '/notifications');
+        if (location.pathname === '/notifications') {
+            setLocationPath(true);
+        } else {
+            getUserNotifications();
+        }
+
+    }
 
     useEffect(() => {
-        getUserNotifications();
-    }, [newNotifications]); // eslint-disable-line react-hooks/exhaustive-deps
+        getLocationAndLoadNotifications();
+    }, [unreadNotifications]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!notifications) {
-        return null;
+        if (locationPath === true) {
+            return (
+                <IconButton disabled={locationPath}>
+                    <Notifications sx={{ fontSize: "25px" }} />
+                </IconButton>
+            )
+        } else {
+            return (
+                <IconButton>
+                    <Notifications sx={{ fontSize: "25px" }} />
+                </IconButton>
+            )
+        }
+        
     }
 
     return (
@@ -87,7 +119,7 @@ const NotificationComponent = () => {
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
          >
-            <Badge badgeContent={newNotifications} max={10} color="primary">
+            <Badge badgeContent={unreadNotifications} max={10} color="primary">
                 <Notifications sx={{ fontSize: "25px" }} />
             </Badge>
             
@@ -132,7 +164,7 @@ const NotificationComponent = () => {
                 </MenuItem>
                 
             ) : (
-                notifications.slice(0).reverse().map(item => (
+                notifications.slice(0, 10).map(item => (
                     
                     item.opened === true ? (
                         <MenuItem key={item._id} onClick={() => openNotification(item.location)}>
@@ -144,6 +176,16 @@ const NotificationComponent = () => {
                         </MenuItem>
                     )
                 ))
+            )}
+            {notifications.length === 0 ? (
+                <MenuItem>
+                No notifications
+                </MenuItem>
+                
+            ) : (
+                <MenuItem dense={true} onClick={() => navigate("/notifications")}>
+                    <ListItemText primary={"Vis alle notifikasjoner"} />
+                </MenuItem>
             )}
          </Menu>
         </>

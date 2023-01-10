@@ -10,10 +10,12 @@ import Navbar from "../navbar";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import TaskInteractionWidget from "../../widgets/TaskInteractionWidget";
 import TaskHistoryWidget from "../../widgets/TaskHistoryWidget";
+import titleNotifications from "../../hooks/titleNotifications";
 
 const TaskPage = () => {
     const { id } = useParams(); 
     const token = useSelector((state) => state.token);
+    const notifications = useSelector((state) => state.notifications);
     const [task, setTask] = useState(null);
 
     const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -43,7 +45,7 @@ const TaskPage = () => {
     return (
         <Box>
             <Helmet>
-                <title>{task.taskName}</title>
+                <title>{titleNotifications(notifications)}{task.taskName}</title>
                 <meta name='description' content='Oppgaveside' />
             </Helmet>
             <Navbar/>

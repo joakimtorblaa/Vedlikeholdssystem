@@ -42,10 +42,23 @@ export const setOpenedNotification = async (req, res) => {
     try {
         const { id } = req.params;
         const notification = await Notification.findById(id);
-        notification.opened = true;
+        notification.opened = !notification.opened;
         await notification.save();
-        res.status(201).json("Set opened to true");
+        res.status(201).json("Task opened status changed");
     } catch (err) {
         res.status(409).json({message: err.message});
+    }
+}
+
+export const setAllOpenedNotifications = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await Notification.updateMany(
+            { reciever : id},
+            { $set : { opened : true }}
+        )
+        res.status(201).json("Marked all notifications as opened");
+    } catch (err) {
+        res.status(409).json({ message: err.message })
     }
 }

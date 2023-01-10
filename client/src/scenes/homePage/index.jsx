@@ -1,17 +1,19 @@
-import{ Box, Typography, useTheme, useMediaQuery, Button } from "@mui/material";
+import{ Box, Button } from "@mui/material";
 import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import WidgetWrapper from "../../components/WidgetWrapper";
+import titleNotifications from "../../hooks/titleNotifications";
 import NavBar from "../navbar";
 
 const HomePage = () => {
     const navigate = useNavigate();
-    const theme = useTheme();
-    const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+    const notifications = useSelector((state) => state.notifications);
+
     return (
         <Box>
             <Helmet>
-                <title>Vedlikehold</title>
+                <title>{titleNotifications(notifications)}Vedlikehold</title>
                 <meta name='description' content='Framside for vedlikeholdssystem.'/>
             </Helmet>
             <NavBar />

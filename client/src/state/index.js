@@ -4,6 +4,7 @@ const initialState = {
     mode: "dark",
     user: null,
     token: null,
+    notifications: 0
 };
 
 export const authSlice = createSlice({
@@ -29,10 +30,12 @@ export const authSlice = createSlice({
             } else {
                 console.error("No members in team");
             }
+        },
+        setUnreadNotifications: (state, action) => {
+            state.notifications = action.payload.notifications;
         }
     }
 })
-
-export const { setMode, setLogin, setLogout, setTeam, setLocations } =
+export const { setMode, setLogin, setLogout, setTeam, setUnreadNotifications } =
     authSlice.actions;
 export default authSlice.reducer;

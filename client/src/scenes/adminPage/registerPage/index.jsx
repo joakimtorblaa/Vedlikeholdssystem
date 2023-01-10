@@ -1,16 +1,19 @@
 import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
+import { useSelector } from 'react-redux';
+import titleNotifications from '../../../hooks/titleNotifications';
 import Form from './Form';
 
 const RegisterPage = () => {
 
+    const notifications = useSelector((state) => state.notifications);
     const theme = useTheme();
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
     return (
         <Box>
             <Helmet>
-                <title>Admin | Opprett bruker</title>
+                <title>{titleNotifications(notifications)} Admin | Opprett bruker</title>
                 <meta name='description' content='Admin - opprett ny bruker'/>
             </Helmet>
             <Box
