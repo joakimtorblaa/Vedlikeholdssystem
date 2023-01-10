@@ -103,9 +103,11 @@ const NotificationWidget = () => {
             }
         )
         const patchedNotification = await response.json();
-        dispatch(
-            setUnreadNotifications({notifications: 0})
-        )
+        if (patchedNotification) {
+            dispatch(
+                setUnreadNotifications({notifications: 0})
+            )
+        }
     }
 
     const openNotification = (location) => {

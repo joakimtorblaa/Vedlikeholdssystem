@@ -3,7 +3,6 @@ import {
     Message,
     DarkMode,
     LightMode,
-    Notifications,
     Settings
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";

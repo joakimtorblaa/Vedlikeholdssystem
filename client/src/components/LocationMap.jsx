@@ -111,7 +111,7 @@ const LocationMap = () => {
                                     <Button  onClick={() => navigate(`/locations/${marker._id}`)}>
                                         ÅPNE
                                     </Button>
-                                    <Button>
+                                    <Button onClick={() => navigate(`/task/new`, { state: { id: marker._id } })}>
                                         NY OPPGAVE
                                     </Button>
                                 </FlexBetween>

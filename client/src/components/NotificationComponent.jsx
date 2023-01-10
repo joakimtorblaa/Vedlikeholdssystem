@@ -81,7 +81,6 @@ const NotificationComponent = () => {
     } 
     
     const getLocationAndLoadNotifications = () => {
-        console.log(location.pathname === '/notifications');
         if (location.pathname === '/notifications') {
             setLocationPath(true);
         } else {

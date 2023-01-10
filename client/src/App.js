@@ -18,6 +18,7 @@ import TasksPage from './scenes/tasksPage';
 import RequireTaskAuth from './features/auth/RequireTaskAuth';
 import { HelmetProvider } from 'react-helmet-async';
 import NotificationPage from './scenes/notificationPage';
+import NewTaskPage from './scenes/taskPage/newTaskPage';
 
 
 
@@ -59,6 +60,10 @@ function App() {
               <Route
                 path="/task/:id"
                 element={isAuth ? <RequireTaskAuth /> : <Navigate to="/" />}
+              />
+              <Route 
+                path="/task/new"
+                element={isAuth ? <NewTaskPage /> : <Navigate to="/" />}
               />
               <Route 
                 path="/notifications"
