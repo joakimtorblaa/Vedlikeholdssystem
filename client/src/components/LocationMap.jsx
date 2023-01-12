@@ -1,5 +1,5 @@
 import { Box, Button, Popover, Typography } from '@mui/material';
-import MapGL, { Marker } from "react-map-gl";
+import MapGL, { Marker, Source } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Place } from '@mui/icons-material';
 import { useState } from 'react';
@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import LocationImage from '../components/LocationImage';
 import FlexBetween from './FlexBetween';
 import { useNavigate } from 'react-router-dom';
+
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 
 const LocationMap = () => {
@@ -60,14 +61,25 @@ const LocationMap = () => {
                 initialViewState={{
                     latitude: 58.185,
                     longitude: 8.143,
-                    zoom: 17
+                    zoom: 17,
+                    pitch: 80,
+                    bearing: -34
                 }}
                 maxZoom="20"
                 style={{width:"100%", height:"100%"}}
-                mapStyle="mapbox://styles/mapbox/streets-v8"
+                mapStyle="mapbox://styles/mapbox/satellite-v9"
                 mapboxAccessToken={MAPBOX_TOKEN}
                 maxBounds={bounds}
+                terrain={{source: 'mapbox-dem', exaggeration: 1.5}}
+                antialias={true}
             >
+            <Source
+                id="mapbox-dem"
+                type="raster-dem"
+                url="mapbox://mapbox.mapbox-terrain-dem-v1"
+                tileSize={512}
+                maxzoom={14}
+            />
             {
                 locations.map((marker) =>(
                    <Marker key={marker._id} longitude={marker.coordsLng} latitude={marker.coordsLat} anchor='bottom'>

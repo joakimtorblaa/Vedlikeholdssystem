@@ -7,8 +7,7 @@ import {
     MenuItem,
     FormControl,
     useTheme,
-    useMediaQuery,
-    Badge
+    useMediaQuery
 } from '@mui/material';
 import {
     Message,
@@ -66,7 +65,7 @@ const Navbar = () => {
                             <LightMode sx={{ color: dark, fontSize: "25px"}} />
                         )}
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={() => navigate("/messages")}>
                         <Message sx={{ fontSize: "25px" }} />
                     </IconButton>
                     <NotificationComponent />

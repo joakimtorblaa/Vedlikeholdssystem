@@ -1,12 +1,13 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
-import HomePage from './scenes/homePage';
-import LoginPage from './scenes/loginPage';
-import RegisterPage from './scenes/adminPage/registerPage';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import { themeSettings } from './theme';
+import { HelmetProvider } from 'react-helmet-async';
+import HomePage from './scenes/homePage';
+import LoginPage from './scenes/loginPage';
+import RegisterPage from './scenes/adminPage/registerPage';
 import AdminPage from './scenes/adminPage';
 import RequireAdminAuth from './features/auth/RequireAuth';
 import DashboardPage from './scenes/adminPage/dashboardPage';
@@ -16,9 +17,10 @@ import LocationPage from './scenes/locationPage';
 import NewLocationPage from './scenes/adminPage/locationPage/newLocationPage';
 import TasksPage from './scenes/tasksPage';
 import RequireTaskAuth from './features/auth/RequireTaskAuth';
-import { HelmetProvider } from 'react-helmet-async';
 import NotificationPage from './scenes/notificationPage';
 import NewTaskPage from './scenes/taskPage/newTaskPage';
+import MessagesPage from './scenes/messagesPage';
+import { io } from 'socket.io-client';
 
 
 
@@ -27,8 +29,11 @@ function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const isAuth = Boolean(useSelector((state) => state.token));
-
+  const socket = io(process.env.REACT_APP_DEVELOPMENT_DATABASE_URL);
   const helmetContext = {};
+
+  
+
 
   return (
     <div className="App">
@@ -64,6 +69,10 @@ function App() {
               <Route 
                 path="/task/new"
                 element={isAuth ? <NewTaskPage /> : <Navigate to="/" />}
+              />
+              <Route 
+                path="/messages"
+                element={isAuth ? <MessagesPage /> : <Navigate to="/" />}
               />
               <Route 
                 path="/notifications"

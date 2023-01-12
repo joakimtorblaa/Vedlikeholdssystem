@@ -1,5 +1,4 @@
 import Location from "../models/Location.js";
-import Task from "../models/Task.js";
 
 export const newLocation = async (req, res) => {
     try {
