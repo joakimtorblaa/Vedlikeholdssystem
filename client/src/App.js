@@ -21,6 +21,7 @@ import NotificationPage from './scenes/notificationPage';
 import NewTaskPage from './scenes/taskPage/newTaskPage';
 import MessagesPage from './scenes/messagesPage';
 import { io } from 'socket.io-client';
+import MessageWidget from './widgets/MessageWidget';
 
 
 
@@ -73,7 +74,12 @@ function App() {
               <Route 
                 path="/messages"
                 element={isAuth ? <MessagesPage /> : <Navigate to="/" />}
-              />
+              >
+                <Route 
+                  path=":id"
+                  element={isAuth ? <MessageWidget /> : <Navigate to="/" />}
+                />
+              </Route>
               <Route 
                 path="/notifications"
                 element={isAuth ? <NotificationPage /> : <Navigate to="/" />}

@@ -14,6 +14,7 @@ import locationRoutes from "./routes/locations.js";
 import taskRoutes from "./routes/tasks.js";
 import notificationRoutes from "./routes/notifications.js";
 import chatRoutes from "./routes/chats.js";
+import messageRoutes from "./routes/messages.js";
 import { register } from "./controllers/auth.js";
 import { newLocation, uploadFileLocation } from "./controllers/locations.js";
 import { newTask, uploadFileTask } from "./controllers/task.js";
@@ -113,6 +114,7 @@ app.use("/locations", locationRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/chats", chatRoutes);
+app.use("/messages", messageRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;

@@ -46,6 +46,7 @@ export const colorTokens = {
                     main: colorTokens.grey[200],
                     mediumMain: colorTokens.grey[300],
                     medium: colorTokens.grey[400],
+                    mediumLight: colorTokens.grey[600],
                     light: colorTokens.grey[700]
                 },
                 background: {

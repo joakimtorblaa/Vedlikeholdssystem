@@ -17,8 +17,7 @@ export const newChat = async (req, res) => {
             latestMessage: content
         });
         const savedChat = await newChat.save();
-        console.log(savedChat._id.toString());
-        console.log(req.body.content);
+
         const newMessage = new Message({
             sender: sender,
             content: content,

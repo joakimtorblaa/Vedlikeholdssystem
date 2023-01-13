@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Send } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 import { ChatList } from "../../components/ChatComponents";
+import { Outlet } from "react-router-dom";
 
 const messageSchema = yup.object().shape({
     content: yup.string().required("Melding kan ikke være tom")
@@ -31,7 +32,7 @@ const MessagesPage = () => {
     const [chatId, setChatId] = useState(null);
     const [currentChat, setCurrentChat] = useState(null);
     const [chatUsers, setChatUsers] = useState(['639f97b792ec05464292dcda', user]);
-    console.log(chatUsers);
+
     const newChat = async (values, onSubmitProps) => {
         const formData = new FormData();
         formData.append('sender', user);
@@ -81,79 +82,24 @@ const MessagesPage = () => {
         setMessages(data);
     }
 
-    const handleFormSubmit = async(values, onSubmitProps) => {
-
-        if (messages === null || messages.length === 0) {
-            await newChat(values, onSubmitProps);
-        } else {
-            await newMessage(values, onSubmitProps);
-        }
-        
-    }
     return (
         <Box>
         <Helmet>
             <title>{titleNotifications(notifications)}Meldinger</title>
-            <meta name='description' content='Oppgaveside' />
+            <meta name='description' content='Meldinger' />
         </Helmet>
         <Navbar/>
             <Box width="60%" height="80vh"  m="2rem auto">
                 <WidgetWrapper height="100%">
                     <FlexBetween height="100%">
                         <ChatList />
-                        <Box 
-                            min-width="700px"
-
-                        >
-                            <Box width="100%">
-                                Test
+                            <Box 
+                                height="100%"
+                                width="100%"
+                                paddingLeft="20px"
+                            >
+                                <Outlet/>
                             </Box>
-                            <Box>
-                                <Box>
-                                <Formik
-                                    onSubmit={handleFormSubmit}
-                                    initialValues={initialValues}
-                                    validationSchema={messageSchema}
-                                >
-                                    {({
-                                        values,
-                                        errors,
-                                        touched,
-                                        handleBlur,
-                                        handleChange,
-                                        handleSubmit,
-                                        setFieldValue,
-                                    }) => (
-                                        <form onSubmit={handleSubmit}>
-                                            <FlexBetween>
-                                                <TextField
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                value={values.content}
-                                                name="content"
-                                                error={Boolean(touched.content) && Boolean(errors.content)}
-                                                helperText={touched.content && errors.content}
-                                                />
-                                                <Button
-                                                    type="submit"
-                                                    sx={{
-                                                        m: "2rem 0",
-                                                        p: "1rem",
-                                                        backgroundColor: palette.primary.main,
-                                                        color: palette.primary.light,
-                                                        "&:hover": { color: palette.primary.main },
-                                                    }}
-                                                >
-                                                    <Send/>
-                                                </Button>
-                                            </FlexBetween>
-                                        </form>
-                                        
-                                    )}
-                                    </Formik>
-                                </Box>
-                            </Box>
-                        </Box>
                     </FlexBetween>
                 </WidgetWrapper>
             </Box>
