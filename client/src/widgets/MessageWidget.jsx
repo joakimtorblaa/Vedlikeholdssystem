@@ -120,8 +120,6 @@ const MessageWidget = () => {
                         {item.fullName}
                         </Typography>
                         
-                    </Box>
-                ))}
             </Box>
             <Box max-height="15%">
                 <Box>
