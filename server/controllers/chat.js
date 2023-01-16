@@ -46,10 +46,11 @@ export const newMessage = async (req, res) => {
             chatId
         });
         const savedMessage = await newMessage.save();
-        
-        const patchChat = Chat.findById(chatId);
+
+        const patchChat = await Chat.findById(chatId);
         patchChat.latestMessage = content;
         await patchChat.save();
+
         res.status(201).json(savedMessage);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -76,6 +77,16 @@ export const getUserChats = async (req, res) => {
             }
         });
         res.status(200).json(chat);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
+
+export const getChatUsers = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const chat = await Chat.findById(id);
+        res.status(200).json(chat.users);
     } catch (err) {
         res.status(404).json({ message: err.message })
     }

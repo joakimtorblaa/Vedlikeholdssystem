@@ -33,9 +33,6 @@ function App() {
   const socket = io(process.env.REACT_APP_DEVELOPMENT_DATABASE_URL);
   const helmetContext = {};
 
-  
-
-
   return (
     <div className="App">
       <BrowserRouter>
@@ -73,11 +70,11 @@ function App() {
               />
               <Route 
                 path="/messages"
-                element={isAuth ? <MessagesPage /> : <Navigate to="/" />}
+                element={isAuth ? <MessagesPage socket={socket}/> : <Navigate to="/" />}
               >
                 <Route 
                   path=":id"
-                  element={isAuth ? <MessageWidget /> : <Navigate to="/" />}
+                  element={isAuth ? <MessageWidget socket={socket}/> : <Navigate to="/" />}
                 />
               </Route>
               <Route 

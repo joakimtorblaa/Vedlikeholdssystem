@@ -91,9 +91,30 @@ const userMiddleware = (req, res, next) => {
     next();
 }
 /* SOCKET.IO ROUTES */
+
 io.on('connection', (socket) => {
-    console.log('User connected');
+    socket.on('message', (data, id) => {
+        let skt = socket.broadcast;
+        skt = id.id ? skt.to(id.id) : skt;
+        skt.emit('messageResponse', (data));
+    });
+
+    socket.on('join-chat', ({id}) => {
+        socket.join(id);
+    });
+
+    socket.on('leave-chat', ({id}) => {
+        socket.leave(id);
+    });
+
+    socket.on('latestMessage', () => {
+        io.emit('lastMessageResponse');
+    })
 });
+
+
+
+
 
 /* ROUTES WITHOUT FILES */
 app.post("/tasks/new", upload.none(), newTask);

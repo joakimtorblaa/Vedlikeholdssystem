@@ -30,7 +30,6 @@ export const getUsers = async (req, res) => {
 export const getMultipleUsers = async (req, res) => {
     try {
         const chatUsers = JSON.parse(req.params.users);
-        
         const allUsers = await Promise.all(
             chatUsers.map((id) => User.findById(id))
         );

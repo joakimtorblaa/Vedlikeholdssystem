@@ -1,18 +1,16 @@
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, List, ListItem, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { Formik } from "formik";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
-import FlexBetween from "../components/FlexBetween";
 import titleNotifications from "../hooks/titleNotifications";
 import * as yup from 'yup';
 import { useEffect, useState } from "react";
 import { AttachFile, Send } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 import { useParams } from "react-router-dom";
-import getChatUsers from "../hooks/getChatUsers";
-import useGetChatUsers from "../hooks/getChatUsers";
-import UserImage from "../components/UserImage";
+import { MessageComponent } from "../components/ChatComponents";
+import { useRef } from "react";
 
 const messageSchema = yup.object().shape({
     content: yup.string()
@@ -22,15 +20,18 @@ const initialValues = {
     content: ""
 }
 
-const MessageWidget = () => {
+const MessageWidget = ({socket}) => {
     const { id } = useParams();
     const { palette } = useTheme();
+    const messagesEnd = useRef();
     const notifications = useSelector((state) => state.notifications);
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
     const [messages, setMessages] = useState([]);
-    const [chatUsers, setChatUsers] = useState(['639f97b792ec05464292dcda', user]);
+    const [chatUsers, setChatUsers] = useState([]);
     const [chatUserInfo, setChatUserInfo] = useState(null);
+    const [currentId, setCurrentId] = useState(null);
+    let listItems;
 
     const newChat = async (values, onSubmitProps) => {
         const formData = new FormData();
@@ -48,7 +49,7 @@ const MessageWidget = () => {
         )
         const data = await response.json();
         if (data) {
-            getMessages(data);
+            getMessagesAndUsers(data);
         }
     }
 
@@ -65,41 +66,100 @@ const MessageWidget = () => {
                 headers: { Authorization: `Bearer ${token}`}
             }
         )
+        const newMessage = await response.json();
+        
+        if (newMessage) {
+            socket.emit('message', {
+                _id: newMessage._id,
+                sender: newMessage.sender,
+                content: newMessage.content,
+                createdAt: newMessage.createdAt,
+                socketID: socket.id
+            },
+            {
+                id: id
+            }
+            );
+            socket.emit('latestMessage');
+            setMessages([...messages, newMessage])
+            onSubmitProps.resetForm();
+        }
+        
     }
-    
-    const getMessages = async (id) => {
-        console.log(id);
+
+    const getChat = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/messages/${id}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/chats/${id}/users`,
             {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}`}
             }
         )
         const data = await response.json();
-        setMessages(data);
+        setChatUsers(data);
+    }
+        
+    
+    const getMessagesAndUsers = async () => {
+        const messageResponse = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/messages/${id}`,
+            {
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}`}
+            }
+        )
+        const messageData = await messageResponse.json();
+        const userResponse = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/users/getMultiple/${JSON.stringify(chatUsers)}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+        )
+        const userData = await userResponse.json();
+
+        setChatUserInfo(userData);
+        setMessages(messageData);
     }
 
     const handleFormSubmit = async(values, onSubmitProps) => {
-
         if (messages === null || messages.length === 0) {
-            await newChat(values, onSubmitProps);
+            //await newChat(values, onSubmitProps);
         } else {
             await newMessage(values, onSubmitProps);
+            
         }   
     }
 
     useEffect(() => {
-        getMessages(id);
-        setChatUserInfo(getChatUsers(chatUsers, token))
-    }, []); //eslint-disable-line react-hooks/exhaustive-deps
+        if (currentId !== id) {
+            setMessages([]);
+            getChat();
+            setCurrentId(id);
+        } else if (messages.length === 0 && chatUsers.length !== 0) {
+            getMessagesAndUsers();
+        } else {
+            renderList();
+        }
+        socket.on('messageResponse', (data) => setMessages([...messages, data]));
+    }, [socket, messages, chatUsers, id]); //eslint-disable-line react-hooks/exhaustive-deps
     
-    if (!messages || !chatUserInfo) {
-        return null;
-    } 
+    useEffect(() => {
+        messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]); //eslint-disable-line react-hooks/exhaustive-deps
 
+    const renderList = () => {
+    }
+    
+    if (!chatUserInfo || !messages) {
+        return null;
+    } else {
+        renderList();
+    }
     return(
-        <Box height="100%" display="flex" flexDirection="column">
+        <Box height="100%" display="flex" flexDirection="column" alignItems="flex-start">
         <Helmet>
             <title>{titleNotifications(notifications)}{id}</title>
             <meta name='description' content='Meldinger' />
@@ -108,20 +168,36 @@ const MessageWidget = () => {
                 display="box"
                 height="100%"
                 width="100%"
+                padding="20px"
+                overflow="auto"
                 sx={{ 
                     backgroundColor: palette.neutral.light,
                     borderRadius: 2,
                     }}
             >
-                {chatUserInfo.map((item) => (
-                    <Box key={item._id}>
-                        <UserImage image={item.picturePath} size="40px" />
-                        <Typography>
-                        {item.fullName}
-                        </Typography>
-                        
+                <List>
+                    {messages.map((item, index) => (
+                        chatUserInfo.map((info) => (
+                            item.sender === info._id && item.sender === user ? (
+                                <ListItem key={item._id}>
+                                    <MessageComponent orientation={"row-reverse"} userInfo={info} message={item.content}/>
+                                </ListItem>
+                            ) : item.sender === info._id ? (
+                                <ListItem key={item._id}>
+                                    <MessageComponent orientation={"row"} userInfo={info} message={item.content}/>
+                                </ListItem>
+                            ) : (
+                                null
+                            ) 
+                        ))
+                    ))
+                    }
+                </List>
+                <div
+                    ref={messagesEnd}>
+                </div>
             </Box>
-            <Box max-height="15%">
+            <Box max-height="15%" alignSelf="stretch">
                 <Box>
                 <Formik
                     onSubmit={handleFormSubmit}
