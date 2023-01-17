@@ -31,28 +31,7 @@ const MessageWidget = ({socket}) => {
     const [chatUsers, setChatUsers] = useState([]);
     const [chatUserInfo, setChatUserInfo] = useState(null);
     const [currentId, setCurrentId] = useState(null);
-    let listItems;
-
-    const newChat = async (values, onSubmitProps) => {
-        const formData = new FormData();
-        formData.append('sender', user);
-        formData.append('content', values.content);
-        formData.append('users', chatUsers);
-
-        const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/messages/newChat`,
-            {
-                method: "POST",
-                body: formData,
-                headers: { Authorization: `Bearer ${token}`}
-            }
-        )
-        const data = await response.json();
-        if (data) {
-            getMessagesAndUsers(data);
-        }
-    }
-
+    
     const newMessage = async (values, onSubmitProps) => {
         const formData = new FormData();
         formData.append('sender', user);
@@ -147,7 +126,7 @@ const MessageWidget = ({socket}) => {
     }, [socket, messages, chatUsers, id]); //eslint-disable-line react-hooks/exhaustive-deps
     
     useEffect(() => {
-        messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
+        messagesEnd.current?.scrollIntoView(0);
     }, [messages]); //eslint-disable-line react-hooks/exhaustive-deps
 
     const renderList = () => {

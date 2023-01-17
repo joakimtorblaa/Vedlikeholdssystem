@@ -12,7 +12,7 @@ import * as yup from 'yup';
 import { useState } from "react";
 import { Send } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
-import { ChatList } from "../../components/ChatComponents";
+import { ChatList, NewChat } from "../../components/ChatComponents";
 import { Outlet } from "react-router-dom";
 
 const messageSchema = yup.object().shape({
@@ -36,7 +36,11 @@ const MessagesPage = ({socket}) => {
             <Box width="60%" height="80vh"  m="2rem auto">
                 <WidgetWrapper height="100%">
                     <FlexBetween height="100%">
-                        <ChatList socket={socket}/>
+                        <Box height="100%" display="flex" flexDirection="column">
+                            <ChatList socket={socket}/>
+                            <NewChat />
+                        </Box>
+                        
                             <Box 
                                 height="100%"
                                 width="100%"

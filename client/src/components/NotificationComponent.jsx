@@ -107,7 +107,6 @@ const NotificationComponent = () => {
                 </IconButton>
             )
         }
-        
     }
 
     return (
@@ -121,7 +120,6 @@ const NotificationComponent = () => {
             <Badge badgeContent={unreadNotifications} max={10} color="primary">
                 <Notifications sx={{ fontSize: "25px" }} />
             </Badge>
-            
          </IconButton>
          <Menu
             anchorEl={anchorEl}
