@@ -4,7 +4,6 @@ import Message from "../models/Message.js";
 export const newChat = async (req, res) => {
     try {
         const {
-            sender,
             content,
         } = req.body;
         console.log(req.body);
@@ -12,21 +11,31 @@ export const newChat = async (req, res) => {
         if (req.body.users.length > 0) {
             splitUsers = req.body.users.split(",");
         }
-        const newChat = new Chat({
-            users: splitUsers,
-            latestMessage: content
-        });
-        const savedChat = await newChat.save();
 
-        const newMessage = new Message({
-            sender: sender,
-            content: content,
-            chatId: savedChat._id.toString()
-        });
+        const existingChats = await Chat.find();
+        let chatExists = false;
+        let chatId;
+        //For å sjekke om chat eksisterer fra før
+        let checker = (arr, target) => target.every(v => arr.includes(v));
 
-        await newMessage.save();
+        for (let item in existingChats){
+            if(checker(existingChats[item].users, splitUsers)){
+                chatExists = true;
+                chatId = existingChats[item]._id;
+                break;
+            }
+        }
+        console.log(chatExists);
+        if(!chatExists){
+            const newChat = new Chat({
+                users: splitUsers,
+                latestMessage: content
+            });
+            const savedChat = await newChat.save();
+            chatId = savedChat._id;
+        }
 
-        res.status(201).json(savedChat._id);
+        res.status(201).json(chatId);
     } catch (err) {
         res.status(500).json({ message: err.message })
     }

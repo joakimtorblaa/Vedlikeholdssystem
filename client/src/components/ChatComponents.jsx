@@ -132,11 +132,11 @@ const MessageComponent = (info) => {
     )
 }
 
-const NewChat = () => {
+const NewChat = ({socket}) => {
     const token = useSelector((state) => state.token);
     const userId = useSelector((state) => state.user);
+    const navigate = useNavigate();
     const [users, setUsers] = useState(null);
-    const [chatUsers, setChatUsers] = useState(null);
     const [open, setOpen] = useState(false);
 
     const initialChatValues = {
@@ -159,9 +159,8 @@ const NewChat = () => {
 
     const newChat = async (values, onSubmitProps) => {
         const formData = new FormData();
-        formData.append('sender', userId);
-        formData.append('content', values.content);
-        formData.append('users', chatUsers);
+        formData.append('content', 'Start på ny samtale');
+        formData.append('users', [values.chatUser, userId]);
 
         const response = await fetch(
             `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/messages/newChat`,
@@ -172,6 +171,12 @@ const NewChat = () => {
             }
         )
         const data = await response.json();
+        console.log(data);
+        if (data) {
+            handleClose();
+            navigate(`/messages/${data}`);
+            socket.emit('latestMessage');
+        }
     }
     useEffect(() => {
         getUsers();
@@ -243,7 +248,7 @@ const NewChat = () => {
                                         </TextField>
                                     </Box>
                                     <Box width="100%" display="box">
-                                        <Button disabled={true} sx={{float: "right"}} onClick="submit">
+                                        <Button sx={{float: "right"}} type="submit">
                                             Opprett
                                         </Button>
                                         <Button sx={{float: "right"}} onClick={handleClose}>

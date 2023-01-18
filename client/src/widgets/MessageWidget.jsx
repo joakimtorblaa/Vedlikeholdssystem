@@ -1,4 +1,4 @@
-import { Button, List, ListItem, TextField, Typography } from "@mui/material";
+import { Button, List, ListItem, ListItemText, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { Formik } from "formik";
 import { Helmet } from "react-helmet-async";
@@ -31,6 +31,7 @@ const MessageWidget = ({socket}) => {
     const [chatUsers, setChatUsers] = useState([]);
     const [chatUserInfo, setChatUserInfo] = useState(null);
     const [currentId, setCurrentId] = useState(null);
+    const [placeholder, setPlaceholder] = useState(false);
     
     const newMessage = async (values, onSubmitProps) => {
         const formData = new FormData();
@@ -100,7 +101,15 @@ const MessageWidget = ({socket}) => {
         const userData = await userResponse.json();
 
         setChatUserInfo(userData);
-        setMessages(messageData);
+        
+        //handle if no messages exists
+        if(messageData.length === 0){
+            setPlaceholder(true);
+            setMessages([{content: 'Start på ny samtale'}]);
+        } else {
+            setPlaceholder(false);
+            setMessages(messageData);
+        }
     }
 
     const handleFormSubmit = async(values, onSubmitProps) => {
@@ -119,8 +128,6 @@ const MessageWidget = ({socket}) => {
             setCurrentId(id);
         } else if (messages.length === 0 && chatUsers.length !== 0) {
             getMessagesAndUsers();
-        } else {
-            renderList();
         }
         socket.on('messageResponse', (data) => setMessages([...messages, data]));
     }, [socket, messages, chatUsers, id]); //eslint-disable-line react-hooks/exhaustive-deps
@@ -128,15 +135,11 @@ const MessageWidget = ({socket}) => {
     useEffect(() => {
         messagesEnd.current?.scrollIntoView(0);
     }, [messages]); //eslint-disable-line react-hooks/exhaustive-deps
-
-    const renderList = () => {
-    }
     
     if (!chatUserInfo || !messages) {
         return null;
-    } else {
-        renderList();
     }
+
     return(
         <Box height="100%" display="flex" flexDirection="column" alignItems="flex-start">
         <Helmet>
@@ -155,22 +158,27 @@ const MessageWidget = ({socket}) => {
                     }}
             >
                 <List>
-                    {messages.map((item, index) => (
-                        chatUserInfo.map((info) => (
-                            item.sender === info._id && item.sender === user ? (
-                                <ListItem key={item._id}>
-                                    <MessageComponent orientation={"row-reverse"} userInfo={info} message={item.content}/>
-                                </ListItem>
-                            ) : item.sender === info._id ? (
-                                <ListItem key={item._id}>
-                                    <MessageComponent orientation={"row"} userInfo={info} message={item.content}/>
-                                </ListItem>
-                            ) : (
-                                null
-                            ) 
+                    {messages.length === 1 && placeholder === true ? (
+                        <ListItem>
+                            <ListItemText primary={messages[0].content} />
+                        </ListItem>
+                    ) : (
+                        messages.map((item, index) => (
+                            chatUserInfo.map((info) => (
+                                item.sender === info._id && item.sender === user ? (
+                                    <ListItem key={item._id}>
+                                        <MessageComponent orientation={"row-reverse"} userInfo={info} message={item.content}/>
+                                    </ListItem>
+                                ) : item.sender === info._id ? (
+                                    <ListItem key={item._id}>
+                                        <MessageComponent orientation={"row"} userInfo={info} message={item.content}/>
+                                    </ListItem>
+                                ) : (
+                                    null
+                                ) 
+                            ))
                         ))
-                    ))
-                    }
+                    )}
                 </List>
                 <div
                     ref={messagesEnd}>

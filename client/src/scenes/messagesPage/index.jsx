@@ -38,7 +38,7 @@ const MessagesPage = ({socket}) => {
                     <FlexBetween height="100%">
                         <Box height="100%" display="flex" flexDirection="column">
                             <ChatList socket={socket}/>
-                            <NewChat />
+                            <NewChat socket={socket}/>
                         </Box>
                         
                             <Box 
