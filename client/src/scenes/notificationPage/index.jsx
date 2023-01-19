@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 import titleNotifications from "../../hooks/titleNotifications";
 import NotificationWidget from "../../widgets/NotificationWidget";
-import Navbar from "../navbar";
 
 const NotificationPage = () => {
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
@@ -15,7 +14,6 @@ const NotificationPage = () => {
                 <title>{titleNotifications(notifications)}Notifikasjoner</title>
                 <meta name='description' content='Liste over notifikasjoner'/>
             </Helmet>
-            <Navbar/>
             {isNonMobileScreens ? (
                 <Box width="50%" m="2rem auto">
                     <NotificationWidget />

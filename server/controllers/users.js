@@ -5,7 +5,8 @@ export const getUser = async (req, res) => {
     try {
         const { id }  = req.params;
         const user = await User.findById(id);
-        delete user.password;
+        user.password = undefined;
+
         res.status(200).json(user);
     } catch (err) {
         res.status(404).json({ message: err.message });
@@ -15,7 +16,7 @@ export const getUser = async (req, res) => {
 export const getUsers = async (req, res) => {
     try {
         const user = await User.find();
-        delete user.password;
+        user.password = undefined;
         const formattedUser = user.map(
             ({ _id, fullName, email, phoneNumber, userType, role, team, picturePath }) => {
                 return { _id, fullName, email, phoneNumber, userType, role, team, picturePath }

@@ -7,6 +7,10 @@ const ChatSchema = new mongoose.Schema({
     },
     latestMessage: {
         type: String
+    },
+    unreadMessage: {
+        type: Array,
+        default: [false, false]
     }
 },
 { timestamps: true }

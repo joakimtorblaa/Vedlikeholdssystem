@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import TaskControlWidget from "../../widgets/TaskControlWidget";
 import TaskMainWidget from "../../widgets/TaskMainWidget";
-import Navbar from "../navbar";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import TaskInteractionWidget from "../../widgets/TaskInteractionWidget";
 import TaskHistoryWidget from "../../widgets/TaskHistoryWidget";
@@ -48,7 +47,6 @@ const TaskPage = () => {
                 <title>{titleNotifications(notifications)}{task.taskName}</title>
                 <meta name='description' content='Oppgaveside' />
             </Helmet>
-            <Navbar/>
             <Box
                 width={isNonMobileScreens ? "80%" : "93%"}
                 m="2rem auto"

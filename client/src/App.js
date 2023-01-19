@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
@@ -22,9 +22,7 @@ import NewTaskPage from './scenes/taskPage/newTaskPage';
 import MessagesPage from './scenes/messagesPage';
 import { io } from 'socket.io-client';
 import MessageWidget from './widgets/MessageWidget';
-
-
-
+import Navbar from './scenes/navbar';
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -39,6 +37,7 @@ function App() {
         <ThemeProvider theme={theme}>
           <HelmetProvider context={helmetContext}>
           <CssBaseline />
+            <Navbar socket={socket}/>
             <Routes>
               <Route 
                 path="/" 

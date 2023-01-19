@@ -1,6 +1,5 @@
 import { useTheme } from "@emotion/react"
-import { Close } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, ListItemText, MenuItem, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, MenuItem, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -41,6 +40,7 @@ const ChatList = ({socket}) => {
 
     useEffect(() => {
         socket.emit('join-chat', {id: id});
+        socket.emit('readMessage', {id: id, user: user});
     }, [socket, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -48,7 +48,7 @@ const ChatList = ({socket}) => {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        socket.on('lastMessageResponse', () => patchLatest());
+        socket.on('latestMessageResponse', () => patchLatest());
     }, [socket]);// eslint-disable-line react-hooks/exhaustive-deps
 
     if (!userChats) {
@@ -58,7 +58,7 @@ const ChatList = ({socket}) => {
         <Box
             display="flex"
             height="100%"
-            width="100%"
+            width="250px"
             flexDirection="column"
             sx={{ 
                 backgroundColor: palette.neutral.light,
@@ -77,7 +77,7 @@ const ChatList = ({socket}) => {
                                 }
                             ]}
                         >
-                            <ChatListComponent user={item.users} chat={item.latestMessage}/>
+                            <ChatListComponent socket={socket} user={item.users} chat={item.latestMessage} chatid={item._id} unread={item.unreadMessage} />
                         </ListItem>
                     )  : (
                         <ListItem 
@@ -87,7 +87,7 @@ const ChatList = ({socket}) => {
                                 {'&:hover':{cursor: 'pointer'},}
                             ]}
                         >
-                            <ChatListComponent user={item.users} chat={item.latestMessage}/>
+                            <ChatListComponent socket={socket} user={item.users} chat={item.latestMessage} chatid={item._id} unread={item.unreadMessage} />
                         </ListItem>
                     )
                 

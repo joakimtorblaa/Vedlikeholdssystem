@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import Navbar from "../navbar";
 import LocationWidget from "../../widgets/LocationWidget";
 import LocationTaskWidget from "../../widgets/LocationTaskWidget";
 import LocationFileWidget from "../../widgets/LocationFileWidget";
@@ -14,7 +13,6 @@ const LocationPage = () => {
 
     return (
         <Box>
-            <Navbar/>
             {isNonMobileScreens ? 
                 <Box
                     width="70%"

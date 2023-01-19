@@ -84,7 +84,8 @@ export const getUserChats = async (req, res) => {
             $expr: {
                 $in: [id, "$users"]
             }
-        });
+        })
+        .sort({'updatedAt': -1});
         res.status(200).json(chat);
     } catch (err) {
         res.status(404).json({ message: err.message });
@@ -98,5 +99,49 @@ export const getChatUsers = async (req, res) => {
         res.status(200).json(chat.users);
     } catch (err) {
         res.status(404).json({ message: err.message })
+    }
+}
+
+export const getAllUnread = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const chats = await Chat.find();
+        let numberOfNotifications = 0;
+        chats.map((item) => {
+            if (item.users.includes(id)) {
+                console.log(item.users.indexOf(id));
+                console.log(item.unreadMessage[item.users.indexOf(id)]);
+                if (item.unreadMessage[item.users.indexOf(id)] === true){
+                    numberOfNotifications++
+                }
+            }
+        });
+        res.status(200).json(numberOfNotifications);
+    } catch (err) {
+        res.status(404).json({ message: err.message })
+    }
+}
+
+export const setUnreadMessage = async (id, user) => {
+    try {
+        const chat = await Chat.findById(id);
+        const userIndex = chat.users.indexOf(user);
+        chat.unreadMessage[userIndex] = true;
+        await chat.save();
+    } catch (err) {
+        console.log('Could not update readstatus');
+    }
+}
+
+export const setReadMessage = async (id, user) => {
+    try {
+        const chat = await Chat.findById(id);
+        const userIndex = chat.users.indexOf(user);
+        if (chat.unreadMessage[userIndex] === true){
+            chat.unreadMessage[userIndex] = false;
+            await chat.save();
+        } 
+    } catch (err) {
+        console.log('Could not update readstatus');
     }
 }

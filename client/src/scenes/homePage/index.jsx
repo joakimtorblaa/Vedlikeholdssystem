@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import titleNotifications from "../../hooks/titleNotifications";
-import NavBar from "../navbar";
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -16,7 +15,6 @@ const HomePage = () => {
                 <title>{titleNotifications(notifications)}Vedlikehold</title>
                 <meta name='description' content='Framside for vedlikeholdssystem.'/>
             </Helmet>
-            <NavBar />
             <Box>
                 <WidgetWrapper>
                     <Box>

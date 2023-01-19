@@ -20,7 +20,7 @@ import { newLocation, uploadFileLocation } from "./controllers/locations.js";
 import { newTask, uploadFileTask } from "./controllers/task.js";
 import { newNotification } from "./controllers/notifications.js";
 import { setFileFolderLocation, setFileFolderTask } from "./middleware/filefolder.js";
-import { newChat, newMessage } from "./controllers/chat.js";
+import { newChat, newMessage, setReadMessage, setUnreadMessage } from "./controllers/chat.js";
 import * as fs from 'fs';
 
 /* SOCKET.IO IMPORTS */
@@ -93,6 +93,8 @@ const userMiddleware = (req, res, next) => {
 /* SOCKET.IO ROUTES */
 
 io.on('connection', (socket) => {
+
+    //messaging
     socket.on('message', (data, id) => {
         let skt = socket.broadcast;
         skt = id.id ? skt.to(id.id) : skt;
@@ -108,7 +110,22 @@ io.on('connection', (socket) => {
     });
 
     socket.on('latestMessage', () => {
-        io.emit('lastMessageResponse');
+        io.emit('latestMessageResponse');
+    });
+    socket.on('notifyNewMessage', ({recipient, location, id}) => {
+        if(location !== `/messages/${id}` && location !== '/messages'){
+            console.log(true);
+            setUnreadMessage(id, recipient);
+            io.emit('notifyUserMessage', (id));
+        } else {
+            setUnreadMessage(id, recipient);
+            io.emit('notifyUserChat', ({id, recipient}));
+        }
+    });
+    
+    socket.on('readMessage', ({id, user}) => {
+        setReadMessage(id, user);
+        io.emit('setReadMessage', ({id, user}));
     })
 });
 

@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import { useEffect, useState } from "react";
 import { AttachFile, Send } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { MessageComponent } from "../components/ChatComponents";
 import { useRef } from "react";
 
@@ -24,6 +24,7 @@ const MessageWidget = ({socket}) => {
     const { id } = useParams();
     const { palette } = useTheme();
     const messagesEnd = useRef();
+    const location = useLocation();
     const notifications = useSelector((state) => state.notifications);
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
@@ -60,6 +61,9 @@ const MessageWidget = ({socket}) => {
                 id: id
             }
             );
+            
+            const recipient = chatUsers.filter((r) => r !== user);
+            socket.emit('notifyNewMessage', {recipient: recipient, location: location.pathname, id: id});
             socket.emit('latestMessage');
             setMessages([...messages, newMessage])
             onSubmitProps.resetForm();

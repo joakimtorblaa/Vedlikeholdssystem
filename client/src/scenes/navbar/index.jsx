@@ -23,8 +23,9 @@ import { useNavigate } from 'react-router-dom';
 import FlexBetween from '../../components/FlexBetween';
 import AdminNavigate from '../../features/auth/AdminNavigateAuth';
 import NotificationComponent from '../../components/NotificationComponent';
+import MessageComponent from '../../components/MessagesComponent';
 
-const Navbar = () => {
+const Navbar = ({socket}) => {
     const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
     
     const dispatch = useDispatch();
@@ -65,9 +66,7 @@ const Navbar = () => {
                             <LightMode sx={{ color: dark, fontSize: "25px"}} />
                         )}
                     </IconButton>
-                    <IconButton onClick={() => navigate("/messages")}>
-                        <Message sx={{ fontSize: "25px" }} />
-                    </IconButton>
+                    <MessageComponent socket={socket}/>
                     <NotificationComponent />
                     <AdminNavigate allowedRoles={'admin'} />
                         

@@ -32,7 +32,6 @@ const MessagesPage = ({socket}) => {
             <title>{titleNotifications(notifications)}Meldinger</title>
             <meta name='description' content='Meldinger' />
         </Helmet>
-        <Navbar/>
             <Box width="60%" height="80vh"  m="2rem auto">
                 <WidgetWrapper height="100%">
                     <FlexBetween height="100%">
