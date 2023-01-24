@@ -11,12 +11,11 @@ import TaskInteractionWidget from "../../widgets/TaskInteractionWidget";
 import TaskHistoryWidget from "../../widgets/TaskHistoryWidget";
 import titleNotifications from "../../hooks/titleNotifications";
 
-const TaskPage = () => {
+const TaskPage = ({socket}) => {
     const { id } = useParams(); 
     const token = useSelector((state) => state.token);
     const notifications = useSelector((state) => state.notifications);
     const [task, setTask] = useState(null);
-
     const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
     const getTask = async () => {
         const response = await fetch(
@@ -62,13 +61,13 @@ const TaskPage = () => {
                             <TaskMainWidget task={task}/>
                         </Box>
                         <Box sx={{gridRow: 1, gridColumn: "span 1"}} gap="10px">
-                            <TaskInteractionWidget task={task} />
+                            <TaskInteractionWidget task={task} socket={socket}/>
                         </Box>
                         <Box sx={{gridRow: 2, gridColumn: "span 1"}} gap="10px">
-                            <TaskControlWidget task={task} />
+                            <TaskControlWidget task={task} socket={socket}/>
                         </Box>
                         <Box sx={{gridRow: 2, gridColumn: "span 1"}} gap="10px">
-                            <TaskHistoryWidget task={task} />
+                            <TaskHistoryWidget task={task} socket={socket}/>
                         </Box>
                     </Box>
                 </WidgetWrapper>

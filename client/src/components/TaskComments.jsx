@@ -16,8 +16,7 @@ const initialCommentValues = {
     comment: '',
 }
 
-const TaskComments = (info) => {
-
+const TaskComments = ({users, task, status, socket}) => {
     const { id } = useParams();
     const fullName = useSelector((state) => state.fullName);
     const token = useSelector((state) => state.token);
@@ -47,8 +46,9 @@ const TaskComments = (info) => {
         )
         onSubmitProps.resetForm();
         getTaskComments();
-        for (let user in info.users) {
-            handleNotifications(fullName, `${fullName} la til en kommentar på ${info.task}.`, info.users[user], `/task/${id}`, token);
+        for (let user in users) {
+            handleNotifications(fullName, `${fullName} la til en kommentar på ${task}.`, users[user], `/task/${id}`, token);
+            socket.emit('createNotification', (users[user]));
         }
     }
 
@@ -88,8 +88,8 @@ const TaskComments = (info) => {
                 <List dense={true}>
                     {comments.slice((page - 1) * itemsPerPage, page * itemsPerPage)
                     .map((item) => (
-                        <ListItem>
-                            <ListItemText key={item.id} primary={item.content} secondary={`${item.postedBy} - ${item.timestamp}`} />
+                        <ListItem key={item.id}>
+                            <ListItemText primary={item.content} secondary={`${item.postedBy} - ${item.timestamp}`} />
                         </ListItem>
                     ))}
                 </List>
@@ -116,7 +116,7 @@ const TaskComments = (info) => {
                     
                 </Box>
             </Box>
-            {taskCompleted(info.status) ? <></> :
+            {taskCompleted(status) ? <></> :
                 <Box>
                 <Formik
                     onSubmit={handleFormSubmit}

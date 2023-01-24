@@ -21,7 +21,7 @@ const handleNotifications = (sender, content, reciever, location, token) => {
         const savedNotification = response.json();
 
         if(savedNotification) {
-            return(console.log("Notification created"));
+            
         }
     }
 

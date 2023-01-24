@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CssBaseline, ThemeProvider } from '@mui/material';
@@ -41,7 +41,7 @@ function App() {
             <Routes>
               <Route 
                 path="/" 
-                element={isAuth ? <HomePage /> : <LoginPage />} 
+                element={isAuth ? <Navigate to="/home" /> : <LoginPage />} 
               />
               <Route 
                 path="/home"
@@ -57,11 +57,11 @@ function App() {
               />
               <Route 
                 path="/tasks"
-                element={isAuth ? <TasksPage /> : <Navigate to="/" />}
+                element={isAuth ? <TasksPage socket={socket}/> : <Navigate to="/" />}
               />
               <Route
                 path="/task/:id"
-                element={isAuth ? <RequireTaskAuth /> : <Navigate to="/" />}
+                element={isAuth ? <RequireTaskAuth socket={socket}/> : <Navigate to="/" />}
               />
               <Route 
                 path="/task/new"

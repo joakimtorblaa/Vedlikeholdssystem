@@ -32,6 +32,24 @@ export const getUserNotifications = async (req, res) => {
         const { id } = req.params;
         const notifications = await Notification.find();
         const userNotifications = notifications.filter((notification) => notification.reciever === id); 
+        let unread = 0;
+        for (let item in userNotifications) {
+            if (userNotifications[item].opened === false) {
+                unread++;
+            }
+        }
+        const recentNotifications = (userNotifications.slice(0).reverse());
+        res.status(200).json({notifications: recentNotifications.slice(0, 10), unreadNotifications: unread});
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
+
+export const getAllUserNotifications = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const notifications = await Notification.find();
+        const userNotifications = notifications.filter((notification) => notification.reciever === id); 
         res.status(200).json(userNotifications);
     } catch (err) {
         res.status(404).json({ message: err.message });
@@ -44,7 +62,7 @@ export const setOpenedNotification = async (req, res) => {
         const notification = await Notification.findById(id);
         notification.opened = !notification.opened;
         await notification.save();
-        res.status(201).json("Task opened status changed");
+        res.status(201).json(notification.opened);
     } catch (err) {
         res.status(409).json({message: err.message});
     }

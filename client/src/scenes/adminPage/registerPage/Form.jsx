@@ -65,6 +65,7 @@ const Form = () => {
     }
 
     const handleFormSubmit = async(values, onSubmitProps) => {
+        console.log('test')
         await register(values, onSubmitProps);
     }
 
@@ -83,7 +84,7 @@ const Form = () => {
                 handleSubmit,
                 setFieldValue,
             }) => (
-                <FormControl fullWidth onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
                     <Box
                         display="grid"
                         gap="30px"
@@ -228,7 +229,7 @@ const Form = () => {
                         OPPRETT BRUKER
                         </Button>
                     </Box>
-                </FormControl>
+                </form>
             )}
         </Formik>
     )

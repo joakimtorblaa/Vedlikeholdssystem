@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Navigate, useLocation, useParams } from "react-router-dom";
 import TaskPage from "../../scenes/taskPage";
 
-const RequireTaskAuth = () => {
+const RequireTaskAuth = ({socket}) => {
     const location = useLocation();
     const { id } = useParams();
     const token = useSelector((state) => state.token);
@@ -63,7 +63,7 @@ const RequireTaskAuth = () => {
     }
     
     const content = (isAdmin === true || isAuth === true 
-        ? <TaskPage /> 
+        ? <TaskPage socket={socket}/> 
         : <Navigate to="/home" state={{ from: location }} replace />
         )
 

@@ -6,15 +6,14 @@ import { useSelector } from "react-redux";
 import FileListTask from "../components/FileListTask";
 import TaskComments from "../components/TaskComments";
 
-const TaskInteractionWidget = (task) => {
+const TaskInteractionWidget = ({task, socket}) => {
 
     const {
         taskName,
         taskStatus,
         userId,
         collaborators
-    } = task.task;
-
+    } = task;
     /* HANDLE TABS */
     const [value, setValue] = useState(0);
 
@@ -76,10 +75,10 @@ const TaskInteractionWidget = (task) => {
                 <Tab label="Filer" {...a11yProps(1)}/>
             </Tabs>
             <TabPanel value={value} index={0}>
-                <TaskComments users={users} task={taskName} status={taskStatus}/>
+                <TaskComments users={users} task={taskName} status={taskStatus} socket={socket}/>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <FileListTask users={users} task={taskName} status={taskStatus}/>
+                <FileListTask users={users} task={taskName} status={taskStatus} socket={socket}/>
             </TabPanel>
         </Box>
     )

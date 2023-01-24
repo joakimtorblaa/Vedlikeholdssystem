@@ -109,8 +109,6 @@ export const getAllUnread = async (req, res) => {
         let numberOfNotifications = 0;
         chats.map((item) => {
             if (item.users.includes(id)) {
-                console.log(item.users.indexOf(id));
-                console.log(item.unreadMessage[item.users.indexOf(id)]);
                 if (item.unreadMessage[item.users.indexOf(id)] === true){
                     numberOfNotifications++
                 }

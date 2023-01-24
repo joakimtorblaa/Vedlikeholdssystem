@@ -23,7 +23,7 @@ const NotificationWidget = () => {
 
     const getUserNotifications = async () => {
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/notifications/${user}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/notifications/all/${user}`,
             {
                 method: "GET",
                 headers: {
@@ -81,6 +81,7 @@ const NotificationWidget = () => {
             }
         )
         const patchedNotification = await response.json();
+        console.log(patchedNotification);
         if (!patchedNotification) {
             dispatch(
                 setUnreadNotifications({notifications: unreadNotifications-1})

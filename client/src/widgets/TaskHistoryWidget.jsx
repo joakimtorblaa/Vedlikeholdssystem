@@ -2,7 +2,7 @@ import { List, ListItem, ListItemText, Pagination, Typography } from "@mui/mater
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 
-const TaskHistoryWidget = (task) => {
+const TaskHistoryWidget = (task, {socket}) => {
 
     const [list, setList] = useState([]);
 

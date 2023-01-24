@@ -127,6 +127,10 @@ io.on('connection', (socket) => {
         setReadMessage(id, user);
         io.emit('setReadMessage', ({id, user}));
     })
+
+    socket.on('createNotification', (id) => {
+        io.emit('newNotification', (id));
+    })
 });
 
 

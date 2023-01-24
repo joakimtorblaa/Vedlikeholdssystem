@@ -2,17 +2,15 @@ import { Badge, IconButton, ListItemText, Menu, MenuItem, useTheme } from "@mui/
 import { Notifications } from "@mui/icons-material";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { setUnreadNotifications } from '../state';
 
-const NotificationComponent = () => {
+const NotificationComponent = ({socket}) => {
     const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
-    const unreadNotifications = useSelector((state) => state.notifications);
+    const [unreadNotifications, setUnreadNotifications] = useState();
     const { palette } = useTheme();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifications, setNotifications] = useState(null);
     const location = useLocation();
@@ -39,16 +37,13 @@ const NotificationComponent = () => {
         );
         const fetchedNotifications = await response.json();
         if (fetchedNotifications) {
-            setNotifications(fetchedNotifications.slice(0).reverse());
-            let totalNotifications = 0;
-            for (let item in fetchedNotifications) {
-                if (fetchedNotifications[item].opened === false) {
-                    totalNotifications++;
-                }
+            console.log(fetchedNotifications.notifications);
+            setNotifications(fetchedNotifications.notifications);
+            if (!location.pathname.includes('notifications')) {
+                setUnreadNotifications(fetchedNotifications.unreadNotifications);
+            } else {
+                setUnreadNotifications(0);
             }
-            dispatch(
-                setUnreadNotifications({notifications: totalNotifications})
-            );
         } else {
             setNotifications(null);
         }
@@ -66,10 +61,7 @@ const NotificationComponent = () => {
         )
         const patchedNotification = await response.json();
         if (patchedNotification) {
-
-            dispatch(
-                setUnreadNotifications({notifications: unreadNotifications-1})
-            )
+            setUnreadNotifications(unreadNotifications-1);
             navigate(location);
             handleClose();
         }
@@ -79,19 +71,33 @@ const NotificationComponent = () => {
         navigate(location);
         handleClose();
     } 
-    
-    const getLocationAndLoadNotifications = () => {
-        if (location.pathname === '/notifications') {
-            setLocationPath(true);
-        } else {
-            getUserNotifications();
-        }
 
+    const showAllNotifications = () => {
+        navigate("/notifications");
+        setLocationPath(true);
+        handleClose();
+    }
+    
+    const getLocationAndLoadNotifications = (id) => {
+        console.log('getting notifications')
+        if (id === user) {
+            if (location.pathname === '/notifications') {
+                setLocationPath(true);
+                setUnreadNotifications(0);
+            } else {
+                setLocationPath(false);
+                getUserNotifications();
+            }
+        }
     }
 
     useEffect(() => {
-        getLocationAndLoadNotifications();
-    }, [unreadNotifications]); // eslint-disable-line react-hooks/exhaustive-deps
+        getLocationAndLoadNotifications(user);
+    }, [location]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        socket.on('newNotification', (id) => getLocationAndLoadNotifications(id));
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!notifications) {
         if (locationPath === true) {
@@ -116,6 +122,7 @@ const NotificationComponent = () => {
             aria-controls={open ? 'notifications' : undefined}
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
+            disabled={locationPath}
          >
             <Badge badgeContent={unreadNotifications} max={10} color="primary">
                 <Notifications sx={{ fontSize: "25px" }} />
@@ -159,10 +166,8 @@ const NotificationComponent = () => {
                 <MenuItem>
                 No notifications
                 </MenuItem>
-                
             ) : (
-                notifications.slice(0, 10).map(item => (
-                    
+                notifications.map(item => (
                     item.opened === true ? (
                         <MenuItem key={item._id} onClick={() => openNotification(item.location)}>
                             <ListItemText primary={item.content} secondary={item.createdAt} />
@@ -175,12 +180,11 @@ const NotificationComponent = () => {
                 ))
             )}
             {notifications.length === 0 ? (
-                <MenuItem>
-                No notifications
+                <MenuItem dense={true} onClick={() => showAllNotifications()}>
+                    <ListItemText primary={"Notifikasjoner"} />
                 </MenuItem>
-                
             ) : (
-                <MenuItem dense={true} onClick={() => navigate("/notifications")}>
+                <MenuItem dense={true} onClick={() => showAllNotifications()}>
                     <ListItemText primary={"Vis alle notifikasjoner"} />
                 </MenuItem>
             )}
