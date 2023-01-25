@@ -14,10 +14,8 @@ const LocationsPage = () => {
                 <title>{titleNotifications(notifications)}Lokasjoner</title>
                 <meta name='description' content='Kart over lokasjoner'/>
             </Helmet>
-            <Box width="100%" position="fixed" marginBottom="80px">
-            </Box>
-            <Box height="100vh">
-                <LocationMap></LocationMap>
+            <Box height="92vh">
+                <LocationMap/>
             </Box>
             
             

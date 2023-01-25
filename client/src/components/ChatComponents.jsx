@@ -1,10 +1,12 @@
 import { useTheme } from "@emotion/react"
-import { Button, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, MenuItem, TextField, Typography } from "@mui/material";
+import { Button, Dialog, DialogContent, DialogTitle, Input, InputAdornment, List, ListItem, ListItemText, MenuItem, TextField, Typography } from "@mui/material";
+import { Search } from '@mui/icons-material';
 import { Box } from "@mui/system"
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import * as yup from 'yup';
 import ChatListComponent from "./ChatListComponent";
 import UserImage from "./UserImage";
 
@@ -84,7 +86,7 @@ const ChatList = ({socket}) => {
                             key={item._id}
                             onClick={() => setChat(item._id)} 
                             sx={[
-                                {'&:hover':{cursor: 'pointer'},}
+                                {'&:hover':{cursor: 'pointer', backgroundColor: palette.neutral.mediumLight}}
                             ]}
                         >
                             <ChatListComponent socket={socket} user={item.users} chat={item.latestMessage} chatid={item._id} unread={item.unreadMessage} />
@@ -137,12 +139,19 @@ const NewChat = ({socket}) => {
     const userId = useSelector((state) => state.user);
     const navigate = useNavigate();
     const [users, setUsers] = useState(null);
+    const [selectedUser, setSelectedUser] = useState("");
+    const [searchText, setSearchText] = useState("");
     const [open, setOpen] = useState(false);
+    const { palette } = useTheme();
 
     const initialChatValues = {
         chatUser: "",
         latestMessage: ""
     }
+
+    const chatSchema = yup.object().shape({
+        chatUser: yup.string().required("Error"),
+    });
 
     const getUsers = async () => {
         const response = await fetch(
@@ -153,7 +162,19 @@ const NewChat = ({socket}) => {
             }
         )
         const data = await response.json();
-        const filteredData = data.filter(item => !(item._id === userId));
+        let filteredData = data.filter(item => !(item._id === userId));
+        filteredData.sort((a, b) => {
+            const nameA = a.fullName.toLowerCase();
+            const nameB = b.fullName.toLowerCase();
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+            //names must be equal
+            return 0;
+        });
         setUsers(filteredData);
     }
 
@@ -171,7 +192,7 @@ const NewChat = ({socket}) => {
             }
         )
         const data = await response.json();
-        console.log(data);
+        
         if (data) {
             handleClose();
             navigate(`/messages/${data}`);
@@ -191,8 +212,18 @@ const NewChat = ({socket}) => {
     }
 
     const handleFormSubmit = async(values, onSubmitProps) => {
+        console.log(values);
         await newChat(values, onSubmitProps);
     }
+
+    if (!users){
+        return null;
+    }
+
+    const filteredUsers = users.filter(
+        ({fullName}) => 
+        fullName.toLowerCase().includes(searchText.toLowerCase())
+    )
 
     return(
         <Box width="100%" mt="20px">
@@ -205,9 +236,25 @@ const NewChat = ({socket}) => {
                 </DialogTitle>
                 <DialogContent>
                     <Box width="500px">
+                        <Box marginBottom="5px">
+                            <TextField 
+                                type="text" 
+                                fullWidth 
+                                placeholder="Søk etter bruker"
+                                value={searchText}
+                                onChange={({ target }) => setSearchText(target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        <Search />
+                                      </InputAdornment>
+                                    ),
+                                  }}/>
+                        </Box>
                         <Formik
                             onSubmit={handleFormSubmit}
                             initialValues={initialChatValues}
+                            validationSchema={chatSchema}
                         >
                             {({
                                 values,
@@ -216,53 +263,90 @@ const NewChat = ({socket}) => {
                                 handleBlur,
                                 handleChange,
                                 handleSubmit,
-                                setFieldValue,
+                                setFieldValue
                             }) => (
                                 <form onSubmit={handleSubmit}>
-                                    <Box>
-                                    <TextField
-                                            select
-                                            label="Velg bruker"
+                                    <Box 
+                                        borderRadius="5px" 
+                                        padding="5px" 
+                                        height="200px" 
+                                        width="100%" 
+                                        overflow="auto" 
+                                        backgroundColor={palette.neutral.light}
+                                    >
+                                        <List>
+                                            {filteredUsers.map((user) => (
+                                                selectedUser === user._id ? (
+                                                    <ListItem
+                                                        key={user._id}
+                                                        onClick={() => {
+                                                            setSelectedUser(user._id);
+                                                            setFieldValue('chatUser', user._id, true);
+                                                        }}
+                                                        sx={[
+                                                            {
+                                                                '&:hover':{cursor: 'pointer'},
+                                                                backgroundColor: palette.neutral.mediumLight
+                                                            }
+                                                        ]}
+                                                    >
+                                                        <Box paddingTop="2px" paddingRight="5px">
+                                                            <UserImage image={user.picturePath} size="35px" /> 
+                                                        </Box>
+                                                        <ListItemText
+                                                            primary={user.fullName}
+                                                            secondary={user.role}
+                                                            
+                                                        />
+                                                    </ListItem>
+                                                ) : (
+                                                    <ListItem
+                                                        key={user._id}
+                                                        onClick={() => {
+                                                            setSelectedUser(user._id);
+                                                            setFieldValue('chatUser', user._id, true);
+                                                        }}
+                                                        sx={[
+                                                            {'&:hover':{cursor: 'pointer', backgroundColor: palette.neutral.mediumLight}}
+                                                        ]}
+                                                    >
+                                                        <Box paddingTop="2px" paddingRight="5px">
+                                                            <UserImage image={user.picturePath} size="35px" /> 
+                                                        </Box>
+                                                        <ListItemText
+                                                            primary={user.fullName}
+                                                            secondary={user.role}
+                                                            
+                                                        />
+                                                    </ListItem>
+                                                )
+                                                
+                                            ))}
+                                        </List>
+                                    </Box>
+                                    <Input  
+                                    type="hidden"
                                             onBlur={handleBlur}
                                             onChange={handleChange}
                                             value={values.chatUser}
                                             name="chatUser"
-                                            error={Boolean(touched.chatUsers) && Boolean(errors.chatUsers)}
-                                            helperText={touched.chatUsers && errors.chatUsers}
-                                            sx={{ gridColumn: "span 4"}}
-                                        >
-                                            <MenuItem key="0" disabled value="" label="Legg til bruker">
-                                                Legg til bruker
-                                            </MenuItem>
-                                            {users && users.map((user) => (
-                                                <MenuItem
-                                                    key={user._id}
-                                                    value={user._id}
-                                                >
-                                                    <ListItemText
-                                                        primary={user.fullName}
-                                                        secondary={user.role}
-                                                    />
-                                                </MenuItem>
-                                            ))}
-                                        </TextField>
-                                    </Box>
+                                            error={Boolean(touched.chatUser) && Boolean(errors.chatUser)}
+                                            helperText={touched.chatUser && errors.chatUser}
+                                    />
                                     <Box width="100%" display="box">
-                                        <Button sx={{float: "right"}} type="submit">
+                                        <Button sx={{float: "right"}} type="submit" onClick={() => console.log(values.chatUser)}>
                                             Opprett
                                         </Button>
                                         <Button sx={{float: "right"}} onClick={handleClose}>
                                             Avbryt
                                         </Button>
                                     </Box>
-                                    
                                 </form>
                             )}
                                 
                         </Formik>
                     </Box>
                 </DialogContent>
-                
             </Dialog>
             <Button
                 fullWidth

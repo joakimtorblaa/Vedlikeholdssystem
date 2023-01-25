@@ -6,7 +6,7 @@ import titleNotifications from '../../hooks/titleNotifications';
 
 import Sidebar from '../sidebar';
 
-const AdminPage = () => {
+const AdminPage = ({socket}) => {
     
     const notifications = useSelector((state) => state.notifications);
     const isNonMobileScreens = useMediaQuery("(min-width:1000px)");

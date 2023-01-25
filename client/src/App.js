@@ -84,11 +84,11 @@ function App() {
               <Route element={isAuth ? <RequireAdminAuth allowedRoles={'admin'} /> : <Navigate to="/"/>}>
                 <Route
                   path="/admin"
-                  element={<AdminPage />}
+                  element={<AdminPage socket={socket}/>}
                 >
                   <Route 
                     path="dashboard" 
-                    element={<DashboardPage />}
+                    element={<DashboardPage socket={socket}/>}
                   />
                   {/* USERS */}
                   <Route 

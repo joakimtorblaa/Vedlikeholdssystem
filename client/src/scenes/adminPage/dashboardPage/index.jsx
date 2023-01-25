@@ -14,10 +14,11 @@ import AdminTaskWidget from "../../../widgets/AdminTaskWidget";
 import FlexBetween from "../../../components/FlexBetween";
 import Clock from "../../../components/Clock";
 import NotificationComponent from "../../../components/NotificationComponent";
+import MessageComponent from '../../../components/MessagesComponent';
 import { Helmet } from "react-helmet-async";
 import titleNotifications from "../../../hooks/titleNotifications";
 
-const DashboardPage = () => {
+const DashboardPage = ({socket}) => {
     const dispatch = useDispatch();
     const notifications = useSelector((state) => state.notifications);
     const theme = useTheme();
@@ -53,10 +54,8 @@ const DashboardPage = () => {
                                     <LightMode sx={{ color: dark, fontSize: "25px"}} />
                                 )}
                                 </IconButton>
-                                <IconButton>
-                                    <Message />
-                                </IconButton>
-                                <NotificationComponent />
+                                <MessageComponent socket={socket}/>
+                                <NotificationComponent socket={socket}/>
                                 <IconButton>
                                     <Settings />
                                 </IconButton>

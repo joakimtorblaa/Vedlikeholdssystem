@@ -37,7 +37,6 @@ const NotificationComponent = ({socket}) => {
         );
         const fetchedNotifications = await response.json();
         if (fetchedNotifications) {
-            console.log(fetchedNotifications.notifications);
             setNotifications(fetchedNotifications.notifications);
             if (!location.pathname.includes('notifications')) {
                 setUnreadNotifications(fetchedNotifications.unreadNotifications);
@@ -79,7 +78,6 @@ const NotificationComponent = ({socket}) => {
     }
     
     const getLocationAndLoadNotifications = (id) => {
-        console.log('getting notifications')
         if (id === user) {
             if (location.pathname === '/notifications') {
                 setLocationPath(true);
