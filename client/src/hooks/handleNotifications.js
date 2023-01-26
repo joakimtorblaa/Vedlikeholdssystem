@@ -1,4 +1,4 @@
-const handleNotifications = (sender, content, reciever, location, token) => {
+const handleNotifications = (sender, content, reciever, location, token, socket) => {
 
     const notification = async () => {
         const formData = new FormData();
@@ -21,7 +21,7 @@ const handleNotifications = (sender, content, reciever, location, token) => {
         const savedNotification = response.json();
 
         if(savedNotification) {
-            
+            socket.emit('createNotification', (reciever));
         }
     }
 

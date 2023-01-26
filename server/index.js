@@ -94,23 +94,22 @@ const userMiddleware = (req, res, next) => {
 
 io.on('connection', (socket) => {
 
+    //chats
+    socket.on('join-chat', ({id}) => {
+        socket.join(id);
+    });
+    socket.on('leave-chat', ({id}) => {
+        socket.leave(id);
+    });
+    socket.on('latestMessage', () => {
+        io.emit('latestMessageResponse');
+    });
+
     //messaging
     socket.on('message', (data, id) => {
         let skt = socket.broadcast;
         skt = id.id ? skt.to(id.id) : skt;
         skt.emit('messageResponse', (data));
-    });
-
-    socket.on('join-chat', ({id}) => {
-        socket.join(id);
-    });
-
-    socket.on('leave-chat', ({id}) => {
-        socket.leave(id);
-    });
-
-    socket.on('latestMessage', () => {
-        io.emit('latestMessageResponse');
     });
     socket.on('notifyNewMessage', ({recipient, location, id}) => {
         if(location !== `/messages/${id}` && location !== '/messages'){
@@ -122,15 +121,30 @@ io.on('connection', (socket) => {
             io.emit('notifyUserChat', ({id, recipient}));
         }
     });
-    
     socket.on('readMessage', ({id, user}) => {
         setReadMessage(id, user);
         io.emit('setReadMessage', ({id, user}));
+    });
+
+    //locations
+    socket.on('locationFile', (id) => {
+        io.emit('refreshLocationFiles', (id));
+    })
+    //tasks
+    socket.on('newComment', (id) => {
+        io.emit('newTaskComment', (id));
+    });
+    socket.on('newHistory', (id) => {
+        io.emit('refreshHistory', (id));
+    });
+    socket.on('taskFile', (id) => {
+        io.emit('refreshTaskFiles', (id));
     })
 
+    //notifications
     socket.on('createNotification', (id) => {
         io.emit('newNotification', (id));
-    })
+    });
 });
 
 

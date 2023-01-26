@@ -32,6 +32,7 @@ const MessageWidget = ({socket}) => {
     const [chatUsers, setChatUsers] = useState([]);
     const [chatUserInfo, setChatUserInfo] = useState(null);
     const [currentId, setCurrentId] = useState(null);
+    const [otherUser, setOtherUser] = useState('Bruker');
     const [placeholder, setPlaceholder] = useState(false);
     
     const newMessage = async (values, onSubmitProps) => {
@@ -103,8 +104,16 @@ const MessageWidget = ({socket}) => {
             }
         )
         const userData = await userResponse.json();
-
         setChatUserInfo(userData);
+        console.log(userData);
+        
+        
+        //get name of other user for helmet
+        for (let item in userData) {
+            if (userData[item]._id !== user) {
+                setOtherUser(userData[item].fullName);
+            }
+        }
         
         //handle if no messages exists
         if(messageData.length === 0){
@@ -143,11 +152,10 @@ const MessageWidget = ({socket}) => {
     if (!chatUserInfo || !messages) {
         return null;
     }
-
     return(
         <Box height="100%" display="flex" flexDirection="column" alignItems="flex-start">
         <Helmet>
-            <title>{titleNotifications(notifications)}{id}</title>
+            <title>{titleNotifications(notifications)}{otherUser}</title>
             <meta name='description' content='Meldinger' />
         </Helmet>
             <Box 

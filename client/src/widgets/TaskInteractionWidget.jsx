@@ -6,6 +6,30 @@ import { useSelector } from "react-redux";
 import FileListTask from "../components/FileListTask";
 import TaskComments from "../components/TaskComments";
 
+const TabPanel = (props) => {
+    const { children, value, index, ...other } = props; 
+
+    return (
+        <Box
+            role="tabpanel"
+            hidden={value !== index}
+            id={`scrollable-auto-tabpanel-${index}`}
+            aria-labelledby={`scrollable-auto-tab-${index}`}
+            {...other}
+        >
+            <Box>
+                {children}
+            </Box>
+        </Box>
+    )
+}
+
+TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired
+};
+
 const TaskInteractionWidget = ({task, socket}) => {
 
     const {
@@ -20,31 +44,6 @@ const TaskInteractionWidget = ({task, socket}) => {
     const handleTab = (e, newValue) => {
         setValue(newValue)
     }
-
-    const TabPanel = (props) => {
-        const { children, value, index, ...other } = props; 
-
-        return (
-            <Box
-                role="tabpanel"
-                hidden={value !== index}
-                id={`scrollable-auto-tabpanel-${index}`}
-                aria-labelledby={`scrollable-auto-tab-${index}`}
-                {...other}
-            >
-                <Box>
-                    {children}
-                </Box>
-            </Box>
-        )
-    }
-
-    TabPanel.propTypes = {
-        children: PropTypes.node,
-        index: PropTypes.any.isRequired,
-        value: PropTypes.any.isRequired
-    };
-
     const a11yProps = (index) => {
         return {
           id: `scrollable-auto-tab-${index}`,

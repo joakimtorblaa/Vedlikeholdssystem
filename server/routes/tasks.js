@@ -1,5 +1,5 @@
 import express from "express";
-import { getTask, getTasks, getLocationTasks, updateTask, addTaskComment, disableTask, getTaskComments, uploadFileTask, getTaskFiles, deleteTaskFile, addTaskCollaborator } from "../controllers/task.js";
+import { getTask, getTasks, getLocationTasks, updateTask, addTaskComment, disableTask, getTaskComments, uploadFileTask, getTaskFiles, deleteTaskFile, addTaskCollaborator, getTaskHistory } from "../controllers/task.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -10,6 +10,7 @@ router.get("/:id", verifyToken, getTask);
 router.get("/locationId/:id", verifyToken, getLocationTasks);
 router.get("/:id/comments", verifyToken, getTaskComments);
 router.get("/:id/taskFiles", verifyToken, getTaskFiles);
+router.get("/:id/history", verifyToken, getTaskHistory);
 
 /* PATCH */
 router.patch("/:id/:status/:fullname", verifyToken, updateTask);

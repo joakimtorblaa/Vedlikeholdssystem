@@ -2,8 +2,10 @@ import { Badge, IconButton, ListItemText, Menu, MenuItem, useTheme } from "@mui/
 import { Notifications } from "@mui/icons-material";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import { setHelmetNotifications } from "../state";
+import getAllNotifications from "../hooks/getAllNotifications"
 
 const NotificationComponent = ({socket}) => {
     const user = useSelector((state) => state.user);
@@ -11,16 +13,15 @@ const NotificationComponent = ({socket}) => {
     const [unreadNotifications, setUnreadNotifications] = useState();
     const { palette } = useTheme();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notifications, setNotifications] = useState(null);
     const location = useLocation();
     const [locationPath, setLocationPath] = useState(false);
     const open = Boolean(anchorEl);
-
     const handleClick = (e) => {
         setAnchorEl(e.target);
     }
-
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -36,8 +37,13 @@ const NotificationComponent = ({socket}) => {
             }
         );
         const fetchedNotifications = await response.json();
+        console.log(await getAllNotifications(user, token))
         if (fetchedNotifications) {
             setNotifications(fetchedNotifications.notifications);
+            const totalNotifications = await getAllNotifications(user, token);
+            dispatch(
+                setHelmetNotifications({notifications: totalNotifications})
+            )
             if (!location.pathname.includes('notifications')) {
                 setUnreadNotifications(fetchedNotifications.unreadNotifications);
             } else {
@@ -61,6 +67,9 @@ const NotificationComponent = ({socket}) => {
         const patchedNotification = await response.json();
         if (patchedNotification) {
             setUnreadNotifications(unreadNotifications-1);
+            dispatch(
+                setHelmetNotifications(await getAllNotifications(user, token))
+            )
             navigate(location);
             handleClose();
         }

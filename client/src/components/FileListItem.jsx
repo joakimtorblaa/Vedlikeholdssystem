@@ -1,21 +1,22 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, ListItem, ListItemButton, ListItemText, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import FileDelete from "../features/auth/FileDeleteAuth";
+import handleNotifications from "../hooks/handleNotifications";
 
 
-const FileListItem = (file) => {
+const FileListItem = ({fileInfo, fileIndex, users, location, category, socket}) => {
     const [open, setOpen] = useState(false);
     const token = useSelector((state) => state.token);
+    const fullName = useSelector((state) => state.fullName);
     const { id } = useParams();
-    const navigate = useNavigate();
 
     const {
         originalname,
         path,
         filename,
-    } = file.fileInfo;
+    } = fileInfo;
 
     const handleOpen = () => {
         setOpen(true);
@@ -35,15 +36,27 @@ const FileListItem = (file) => {
     const deleteFile = async (index) => {
         // eslint-disable-next-line
         const response = await fetch(
-            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/${file.category}/${id}/${index}`,
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/${category}/${id}/${index}`,
             {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
                 }
             });
+            if(category === 'tasks'){
+                if (!users) {
+                    console.log('No users, not creating notification.')
+                } else {
+                    for (let user in users) {
+                        handleNotifications(fullName, `${fullName} slettet ${originalname} fra ${location}.`, users[user], `/task/${id}`, token, socket)
+                    }
+                    socket.emit('taskFile', id);
+                }
+            } else if (category === 'locations') {
+                socket.emit('locationFile', id);
+            }
+            
         handleClose();
-        navigate(0);
     }
 
 
@@ -66,7 +79,7 @@ const FileListItem = (file) => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Avbryt</Button>
-                        <Button onClick={() => deleteFile(file.fileIndex)} autoFocus>
+                        <Button onClick={() => deleteFile(fileIndex)} autoFocus>
                             Slett fil
                         </Button>
                     </DialogActions>

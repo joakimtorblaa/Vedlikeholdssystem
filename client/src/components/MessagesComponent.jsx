@@ -24,7 +24,7 @@ const NotificationComponent = ({socket}) => {
         const data = await response.json();
 
         if (data) {
-            setBadgeCounter(data)
+            setBadgeCounter(data);
         } else {
             setBadgeCounter(0);
         }
@@ -44,7 +44,6 @@ const NotificationComponent = ({socket}) => {
 
     useEffect(() => {
         getUnreadMessages();
-        console.log('tester');
     }, [location]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {

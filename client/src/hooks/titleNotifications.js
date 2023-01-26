@@ -1,5 +1,4 @@
 const titleNotifications = ( notifications ) => {
-    
     if (notifications > 0) {
         return (
             `(${notifications}) `

@@ -9,7 +9,7 @@ import handleNotifications from "../hooks/handleNotifications";
 import taskCompleted from "../hooks/taskCompleted";
 
 const commentSchema = yup.object().shape({
-    comment: yup.string().max(255).required("Legg til kommentar"),
+    comment: yup.string().max(255).required(),
 });
 
 const initialCommentValues = {
@@ -45,11 +45,10 @@ const TaskComments = ({users, task, status, socket}) => {
             }
         )
         onSubmitProps.resetForm();
-        getTaskComments();
         for (let user in users) {
             handleNotifications(fullName, `${fullName} la til en kommentar på ${task}.`, users[user], `/task/${id}`, token);
-            socket.emit('createNotification', (users[user]));
         }
+        socket.emit('newComment', (id));
     }
 
     const handleFormSubmit = async(values, onSubmitProps) => {
@@ -74,9 +73,20 @@ const TaskComments = ({users, task, status, socket}) => {
         }
     }
 
+    const getCurrentTaskComments = (data) => {
+        console.log(data);
+        if (data === id) {
+            getTaskComments();
+        }
+    }
+
     useEffect(() => {
         getTaskComments();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        socket.on('newTaskComment', (data) => getCurrentTaskComments(data))
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!comments) {
         return null;
@@ -141,7 +151,6 @@ const TaskComments = ({users, task, status, socket}) => {
                                 value={values.comment}
                                 name="comment"
                                 error={Boolean(touched.comment) && Boolean(errors.comment)}
-                                helperText={touched.comment && errors.comment}
                                 inputProps={{ maxLength: 255 }}
                             />
                             <Typography>

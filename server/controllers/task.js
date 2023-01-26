@@ -152,6 +152,17 @@ export const getTaskComments = async (req, res) => {
     }
 }
 
+export const getTaskHistory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const task = await Task.findById(id);
+        
+        res.status(200).json(task.history);
+    } catch (err) {
+        res.status(404).json({ message: err.message });
+    }
+}
+
 export const getTaskFiles = async (req, res) => {
     try {
         const { id } = req.params;
@@ -194,9 +205,7 @@ export const deleteTaskFile = async (req, res) => {
         task.taskFiles.splice(fileIndex, 1);
 
         await task.save();
-        const newFile = location.locationFiles;
-
-        res.status(201).json(newFile);
+        res.status(201).json('File deleted');
     } catch (err) {
         res.status(409).json({ message: err.message });
     }

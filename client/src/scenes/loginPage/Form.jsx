@@ -11,6 +11,7 @@ import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setLogin } from '../../state';
+import getAllNotifications from '../../hooks/getAllNotifications';
 
 const loginSchema = yup.object().shape({
     userName: yup.string().required(),
@@ -41,12 +42,14 @@ const Form = () => {
         onSubmitProps.resetForm();
 
         if (loggedIn) {
+            const notifications = await getAllNotifications(loggedIn.user._id, loggedIn.token)
             dispatch(
                 setLogin({
                     user: loggedIn.user._id,
                     token: loggedIn.token,
                     type: loggedIn.type,
                     fullName: loggedIn.user.fullName,
+                    notifications: notifications
                 })
             );
             navigate("/home");

@@ -33,7 +33,7 @@ const initialFileValues = {
     file: ""
 }
 
-const FileListTask = (info) => {
+const FileListTask = ({users, task, status, socket}) => {
     const { palette } = useTheme();
     const { id } = useParams();
     const [open, setOpen] = useState(false);
@@ -76,11 +76,11 @@ const FileListTask = (info) => {
         onSubmitProps.resetForm();
     
         if(savedFile) {
-            console.log("Added new file to task");
-            for (let user in info.users) {
-                handleNotifications(fullName, `${fullName} lastet opp en fil på ${info.task}.`, info.users[user], `/task/${id}`, token)
+            for (let user in users) {
+                handleNotifications(fullName, `${fullName} lastet opp en fil på ${task}.`, users[user], `/task/${id}`, token, socket)
             }
-            
+            socket.emit('newHistory', id);
+            socket.emit('taskFile', id);
             getTaskFiles();
             handleClose();
         }
@@ -109,9 +109,19 @@ const FileListTask = (info) => {
     const findIndexInArray = (file) => {
         return (arrayCheck.indexOf(file))
     }
+
+    const handleNewTaskFiles = (data) => {
+        if (data === id) {
+            getTaskFiles();
+        }
+    }
     useEffect(() => {
         getTaskFiles();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+         socket.on('refreshTaskFiles', (data) => handleNewTaskFiles(data));
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
     
     const handleFormSubmit = async(values, onSubmitProps) => {
@@ -198,7 +208,7 @@ const FileListTask = (info) => {
             </Dialog>
             <List>
                 {/* HANDLE TASKCOMPLETED FOR TASK FILES */}
-                {files && !taskCompleted(info.status) ? 
+                {files && !taskCompleted(status) ? 
                     <Box>
                         
                         <ListItem
@@ -216,7 +226,7 @@ const FileListTask = (info) => {
                         </ListItem>
                         <Divider />
                     </Box>
-                : files && taskCompleted(info.status) ?
+                : files && taskCompleted(status) ?
                     <ListItem>
                         <Typography
                             fontWeight="bold"
@@ -224,7 +234,7 @@ const FileListTask = (info) => {
                             Oppgavefiler
                         </Typography>
                     </ListItem>
-                : !files && taskCompleted(info.status) ? 
+                : !files && taskCompleted(status) ? 
                     <ListItem>
                         <Typography
                             fontWeight="bold"
@@ -253,7 +263,7 @@ const FileListTask = (info) => {
                     files
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
                     .map((file) =>(
-                        <FileListItem key={findIndexInArray(file)} fileInfo={file} fileIndex={findIndexInArray(file)} category="tasks"/>
+                        <FileListItem key={findIndexInArray(file)} fileInfo={file} fileIndex={findIndexInArray(file)} users={users} location={task} category="tasks" socket={socket}/>
                     ))
                 }
                 {showPages ?

@@ -20,7 +20,7 @@ import WidgetWrapper from "../components/WidgetWrapper";
 import Pagination from "@mui/material/Pagination";
 import FileListItem from "../components/FileListItem";
 
-const LocationFileWidget = (gridAdjust) => {
+const LocationFileWidget = ({gRow, gColumn, socket}) => {
     const [open, setOpen] = useState(false);
     const [files, setFiles] = useState(null);
     const [arrayCheck, setArrayCheck] = useState(null);
@@ -64,12 +64,21 @@ const LocationFileWidget = (gridAdjust) => {
         return (arrayCheck.indexOf(file))
     }
 
+    const handleFileRefresh = (data) => {
+        if (data === id){
+            getLocationFiles();
+        }
+    }
+
     useEffect(() => {
         getLocationFiles();
     }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        socket.on('refreshLocationFiles', (data) => handleFileRefresh(data));
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <WidgetWrapper sx={{gridRow: gridAdjust.gRow, gridColumn: gridAdjust.gColumn}}>
+        <WidgetWrapper sx={{gridRow: gRow, gridColumn: gColumn}}>
             <Box>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogActions>
@@ -113,7 +122,7 @@ const LocationFileWidget = (gridAdjust) => {
                     files
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
                     .map((file) =>(
-                        <FileListItem key={findIndexInArray(file)} fileInfo={file} fileIndex={findIndexInArray(file)} category="locations"/>
+                        <FileListItem key={findIndexInArray(file)} fileInfo={file} fileIndex={findIndexInArray(file)} users={null} location={null} category="locations" socket={socket}/>
                     ))
                     }
                     {/* FINN UT AV NEDLASTNING AV FIL LOGIKK OVER */}

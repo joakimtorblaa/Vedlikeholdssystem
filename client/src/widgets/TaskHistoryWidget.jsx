@@ -1,18 +1,36 @@
 import { List, ListItem, ListItemText, Pagination, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
-const TaskHistoryWidget = (task, {socket}) => {
+const TaskHistoryWidget = ({socket}) => {
+    
+    const token = useSelector((state) => state.token);
+    const { id } = useParams();
 
     const [list, setList] = useState([]);
 
-    const {
-        history
-    } = task.task;
-
-    const historyList = history.map((item) => (
-        JSON.parse(item)
-    ));
+    const getTaskHistory = async () => {
+        const response = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/history`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+        const data = await response.json();
+        
+        if (data) {
+            const parsedList = data.map((item) => (
+                JSON.parse(item)
+            ));
+            setList(parsedList.slice(0).reverse());
+            setNoOfPages(Math.ceil(parsedList.length / itemsPerPage));
+        }
+    }
     
     /* HANDLE PAGINATION */
     const itemsPerPage = 5;
@@ -23,12 +41,22 @@ const TaskHistoryWidget = (task, {socket}) => {
         //removing e breaks page function of Pagination
         setPage(value)
     }
+    const handleNewHistory = (data) => {
+        if (data === id) {
+            getTaskHistory();
+        }
+    }
 
     useEffect(() => {
-        setList(history.slice(0).reverse())
-        setNoOfPages(Math.ceil(historyList.length / itemsPerPage));
+        //setList(history.slice(0).reverse());
+        getTaskHistory();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+    useEffect(() => {
+        socket.on('refreshHistory', (data) => handleNewHistory(data));
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    console.log(list);
     return (
         <Box>
             <Typography
@@ -38,7 +66,7 @@ const TaskHistoryWidget = (task, {socket}) => {
                     Oppgavehistorikk
                 </Typography>
                 <List>
-                    {historyList
+                    {list
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
                     .map((item) => (
                         <ListItem key={item.id}>
@@ -49,7 +77,7 @@ const TaskHistoryWidget = (task, {socket}) => {
                         </ListItem>
                     ))}
                 </List>
-                {historyList.length > 5 ? (
+                {list.length > 5 ? (
                     <Box 
                         display="flex"
                         justifyContent="center"

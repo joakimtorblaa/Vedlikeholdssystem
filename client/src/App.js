@@ -53,7 +53,7 @@ function App() {
               />
               <Route
                 path="/locations/:id"
-                element={isAuth ? <LocationPage /> : <Navigate to="/" />}
+                element={isAuth ? <LocationPage socket={socket}/> : <Navigate to="/" />}
               />
               <Route 
                 path="/tasks"

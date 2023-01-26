@@ -18,11 +18,13 @@ export const authSlice = createSlice({
             state.user = action.payload.user;
             state.token = action.payload.token;
             state.fullName = action.payload.fullName;
+            state.notifications = action.payload.notifications;
         },
         setLogout: (state) => {
             state.user = null;
             state.token = null;
             state.fullName = null;
+            state.notifications = null;
         },
         setTeam: (state, action) => {
             if (state.user) {
@@ -31,11 +33,13 @@ export const authSlice = createSlice({
                 console.error("No members in team");
             }
         },
-        setUnreadNotifications: (state, action) => {
+        setHelmetNotifications: (state, action) => {
+            console.log(action.payload);
+            console.log(state.notifications);
             state.notifications = action.payload.notifications;
         }
     }
 })
-export const { setMode, setLogin, setLogout, setTeam, setUnreadNotifications } =
+export const { setMode, setLogin, setLogout, setTeam, setHelmetNotifications } =
     authSlice.actions;
 export default authSlice.reducer;

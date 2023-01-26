@@ -67,7 +67,7 @@ const TaskPage = ({socket}) => {
                             <TaskControlWidget task={task} socket={socket}/>
                         </Box>
                         <Box sx={{gridRow: 2, gridColumn: "span 1"}} gap="10px">
-                            <TaskHistoryWidget task={task} socket={socket}/>
+                            <TaskHistoryWidget socket={socket}/>
                         </Box>
                     </Box>
                 </WidgetWrapper>

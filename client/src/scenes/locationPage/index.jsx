@@ -6,7 +6,7 @@ import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import LocationTaskArchiveWidget from "../../widgets/LocationTaskArchiveWidget";
 
-const LocationPage = () => {
+const LocationPage = ({socket}) => {
     const theme = useTheme();
 
     const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -24,7 +24,7 @@ const LocationPage = () => {
                     gridAutoColumns="1fr"
                 >
                     <LocationWidget gRow="1" gColumn="span 2"/>
-                    <LocationFileWidget gRow="1" gColumn="span 2"/>
+                    <LocationFileWidget gRow="1" gColumn="span 2" socket={socket}/>
                     <LocationTaskWidget gRow="2" gColumn="span 2"/>
                     <LocationTaskArchiveWidget gRow="2" gColumn="span 2"/>
                     

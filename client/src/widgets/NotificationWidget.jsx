@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "../components/FlexBetween";
 import WidgetWrapper from "../components/WidgetWrapper";
-import { setUnreadNotifications } from '../state';
+import { setHelmetNotifications } from '../state';
 
 const NotificationWidget = () => {
     const user = useSelector((state) => state.user);
@@ -42,7 +42,7 @@ const NotificationWidget = () => {
                 }
             }
             dispatch(
-                setUnreadNotifications({notifications: totalNotifications})
+                setHelmetNotifications({notifications: totalNotifications})
             );
             setShowAll(true);
         } else {
@@ -64,7 +64,7 @@ const NotificationWidget = () => {
         const patchedNotification = await response.json();
         if (patchedNotification) {
             dispatch(
-                setUnreadNotifications({notifications: unreadNotifications-1})
+                setHelmetNotifications({notifications: unreadNotifications-1})
             )
             navigate(location);
         }
@@ -84,11 +84,11 @@ const NotificationWidget = () => {
         console.log(patchedNotification);
         if (!patchedNotification) {
             dispatch(
-                setUnreadNotifications({notifications: unreadNotifications-1})
+                setHelmetNotifications({notifications: unreadNotifications-1})
             );
         } else {
             dispatch(
-                setUnreadNotifications({notifications: unreadNotifications+1})
+                setHelmetNotifications({notifications: unreadNotifications+1})
             );
         }
     }
@@ -106,7 +106,7 @@ const NotificationWidget = () => {
         const patchedNotification = await response.json();
         if (patchedNotification) {
             dispatch(
-                setUnreadNotifications({notifications: 0})
+                setHelmetNotifications({notifications: 0})
             )
         }
     }
