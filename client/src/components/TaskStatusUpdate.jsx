@@ -6,12 +6,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import handleNotifications from "../hooks/handleNotifications";
 
     
-    const TaskStatusUpdate = (info) => {
+    const TaskStatusUpdate = ({status, users, task, socket}) => {
         const navigate = useNavigate();
         const { id } = useParams();
         const token = useSelector((state) => state.token);
         const fullName = useSelector((state) => state.fullName);
-        const [currentStatus, setCurrentStatus] = useState(info.status);
+        const [currentStatus, setCurrentStatus] = useState(status);
         const [changed, setChanged] = useState(true);
 
         const taskStatus = [
@@ -20,7 +20,8 @@ import handleNotifications from "../hooks/handleNotifications";
             "Venter på svar",
             "Satt på vent",
             "Forsinket",
-            "Avsluttet"
+            "Avsluttet",
+            "Fullført"
         ]
 
 
@@ -37,16 +38,43 @@ import handleNotifications from "../hooks/handleNotifications";
                     }
                 }
             );
-            for (let user in info.users) {
-                handleNotifications(fullName, `${fullName} endret status på ${info.task} til ${currentStatus}.`, info.users[user], `/task/${id}`, token);
+            const data = await response.json();
+            if (data) {
+                if (currentStatus === 'Avsluttet' || currentStatus === 'Fullørt') {
+                    for (let user in users) {
+                        handleNotifications(fullName, `${fullName} lukket ${task}, da oppgaven er markert som ${currentStatus}.`, users[user], `/task/${id}`, token, socket);
+                    }
+                    console.log(currentStatus);
+                    socket.emit('taskStatusUpdate', id);
+                    socket.emit('newHistory', id);
+                } else {
+                    for (let user in users) {
+                        handleNotifications(fullName, `${fullName} endret status på ${task} til ${currentStatus}.`, users[user], `/task/${id}`, token, socket);
+                    }
+                    console.log(currentStatus);
+                    socket.emit('taskStatusUpdate', id);
+                    socket.emit('newHistory', id);
+                }
             }
-            navigate(0);
-
         }
 
         useEffect(() => {
-            setCurrentStatus(info.status);
+            setCurrentStatus(status);
         }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+        const handleUpdate = (status) => {
+            if (status === "Fullført"){
+                if (window.confirm("Er du sikker på at du vil markere oppgaven som fullført? Det vil ikke være mulig å gjøre endringer eller endre status etter oppgaven er markert som fullført.")){
+                    updateTask();
+                }
+            } else if (status === "Avsluttet") {
+                if (window.confirm("Er du sikker på at du vil markere oppgaven som Avsluttet? Det vil ikke være mulig å gjøre endringer eller endre status etter oppgaven er markert som Avsluttet.")) {
+                    updateTask();
+                }
+            } else {
+                updateTask();
+            }
+        }
 
         const handleChange = (e) => {
             setCurrentStatus(e.target.value);
@@ -69,7 +97,7 @@ import handleNotifications from "../hooks/handleNotifications";
                             </MenuItem>
                         ))}
                     </TextField>
-                    <Button disabled={changed} onClick={() => updateTask()}>
+                    <Button disabled={changed} onClick={() => handleUpdate(currentStatus)}>
                         Oppdater
                     </Button>
                 </Box>

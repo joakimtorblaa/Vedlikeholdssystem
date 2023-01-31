@@ -48,7 +48,6 @@ const TaskHistoryWidget = ({socket}) => {
     }
 
     useEffect(() => {
-        //setList(history.slice(0).reverse());
         getTaskHistory();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

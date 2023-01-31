@@ -139,6 +139,12 @@ io.on('connection', (socket) => {
     });
     socket.on('taskFile', (id) => {
         io.emit('refreshTaskFiles', (id));
+    });
+    socket.on('taskStatusUpdate', (id) => {
+        io.emit('refreshTask', (id));
+    })
+    socket.on('taskCollaboratorUpdate', (id) => {
+        io.emit('refreshTask', (id));
     })
 
     //notifications

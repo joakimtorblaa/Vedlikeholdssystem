@@ -5,8 +5,9 @@ import { useState } from "react";
 import TaskNavigateAuth from "../features/auth/TaskNavigateAuth";
 import Collaborators from "./Collaborators";
 import UserComponent from "./UserComponent";
+import moment from "moment";
 
-const TaskListItem = (task) => {
+const TaskListItem = ({taskInfo}) => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(true);
@@ -19,7 +20,7 @@ const TaskListItem = (task) => {
         <>  
             <ListItem
                 secondaryAction={
-                    <TaskNavigateAuth taskAuth={task.taskInfo}/>
+                    <TaskNavigateAuth taskAuth={taskInfo}/>
                 }
             >
                 <Dialog
@@ -36,27 +37,27 @@ const TaskListItem = (task) => {
                             fontWeight="bold"
                             variant="h4"
                         >
-                            {task.taskInfo.taskName}
+                            {taskInfo.taskName}
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText>
                                 <Typography>
-                                    {task.taskInfo.description}
+                                    {taskInfo.description}
                                 </Typography>
                                 <Typography
                                     fontWeight="bold"
                                 >
-                                    {task.taskInfo.taskType}
+                                    {taskInfo.taskType}
                                 </Typography>
                                 <Typography>
-                                    Status: {task.taskInfo.taskStatus}
+                                    Status: {taskInfo.taskStatus}
                                 </Typography>
                                 <Typography>
                                     Opprettet av:
                                 </Typography>
-                                <UserComponent createdBy={task.taskInfo.userId}/>
+                                <UserComponent createdBy={taskInfo.userId}/>
                                 
-                                {task.taskInfo.collaborators.length === 0 ? (
+                                {taskInfo.collaborators.length === 0 ? (
                                     <Typography>
                                         Ingen tilknyttede brukere
                                     </Typography>
@@ -65,7 +66,7 @@ const TaskListItem = (task) => {
                                         <Typography>
                                             Tilknyttede brukere
                                         </Typography>
-                                        <Collaborators collaborator={task.taskInfo.collaborators}/>
+                                        <Collaborators collaborator={taskInfo.collaborators}/>
                                     </Box>
                                 )}
                                 
@@ -77,8 +78,8 @@ const TaskListItem = (task) => {
                 
                 <ListItemButton onClick={handleOpen}>
                     <ListItemText
-                        primary={task.taskInfo.taskName}
-                        secondary={task.taskInfo.taskType + " - Opprettet av: " + task.taskInfo.createdBy }
+                        primary={taskInfo.taskName}
+                        secondary={`${taskInfo.taskType} - Opprettet ${moment(taskInfo.createdAt).utc().format('DD.MM.YY')} av ${taskInfo.createdBy}`}
                     />
                 </ListItemButton>
             </ListItem>  

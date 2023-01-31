@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import accessControl from "../hooks/accessControl";
-import { TaskAddColabForm } from "./TaskControlForms";
+import { TaskAddColabForm, TaskRemoveColabForm } from "./TaskControlForms";
 
 const TaskDisable = () => {
     const { id } = useParams();
@@ -39,7 +39,7 @@ const TaskDisable = () => {
 }
 
 
-const TaskAddColab = ({allowedRoles, user, currentUsers, taskName}) => {
+const TaskAddColab = ({allowedRoles, user, currentUsers, taskName, socket}) => {
     const token = useSelector((state) => state.token);
     const userId = useSelector((state) => state.user);
     
@@ -86,7 +86,7 @@ const TaskAddColab = ({allowedRoles, user, currentUsers, taskName}) => {
                     <IconButton onClick={handleClose}>
                         <Close />
                     </IconButton>
-                    <TaskAddColabForm currentUsers={currentUsers} createdBy={user} taskName={taskName}/>
+                    <TaskAddColabForm currentUsers={currentUsers} createdBy={user} taskName={taskName} socket={socket} handleClose={handleClose}/>
                 </DialogContent>
             </Dialog>
             <Button variant="outlined" color="info" onClick={handleOpen}>
@@ -99,10 +99,11 @@ const TaskAddColab = ({allowedRoles, user, currentUsers, taskName}) => {
     return content;
 }
 
-const TaskRemoveColab = ({allowedRoles, user}) => {
+const TaskRemoveColab = ({allowedRoles, user, currentUsers, taskName, socket}) => {
     const token = useSelector((state) => state.token);
     const userId = useSelector((state) => state.user);
     const [roles, setRoles] = useState(null);
+    const [open, setOpen] = useState(false);
 
     const getUserRole = async () => {
         const response = await fetch(
@@ -118,15 +119,39 @@ const TaskRemoveColab = ({allowedRoles, user}) => {
         setRoles(accessControl(data));
     }
 
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
     if (!roles) {
         getUserRole();
         return null;
     }
 
     const content = (roles.some(role => allowedRoles.includes(role)) || userId === user
-        ?   <Button variant="outlined" color="info">
+        ?   
+        <Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+            >
+                <DialogContent>
+                    <IconButton onClick={handleClose}>
+                        <Close />
+                    </IconButton>
+
+                    <TaskRemoveColabForm currentUsers={currentUsers} createdBy={user} taskName={taskName} socket={socket} handleClose={handleClose}/>
+                </DialogContent>
+            </Dialog>
+            <Button variant="outlined" color="info" onClick={handleOpen}>
                 <PersonRemove /> fjern bruker
             </Button>
+        </Box>
+        
         : <></>
        )
     return content;

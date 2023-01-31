@@ -8,14 +8,14 @@ import TaskStatusUpdate from "../components/TaskStatusUpdate";
 import TaskDelete from "../features/auth/TaskDeleteAuth";
 import taskCompleted from "../hooks/taskCompleted";
 
-const TaskControlWidget = (task) => {
+const TaskControlWidget = ({task, socket}) => {
 
     const {
         collaborators,
         taskName,
         taskStatus,
         userId
-    } = task.task;
+    } = task;
 
     /* ADDING RECIEVERS OF NOTIFICATIONS */
     const user = useSelector((state) => state.user);
@@ -66,12 +66,12 @@ const TaskControlWidget = (task) => {
             {taskCompleted(taskStatus) ? <><TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} /></> :
                 <Box>
                     <FlexBetween>
-                        <TaskStatusUpdate status={taskStatus} users={users} task={taskName}/>
+                        <TaskStatusUpdate status={taskStatus} users={users} task={taskName} socket={socket}/>
                     </FlexBetween>
                         <Box padding="1rem 0">
                             <FlexBetween>
-                                <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName}/>
-                                <TaskRemoveColab allowedRoles={'admin'} user={userId}/>
+                                <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
+                                <TaskRemoveColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
                                 <TaskEdit allowedRoles={'admin'} user={userId}/>
                                 <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
                             </FlexBetween>

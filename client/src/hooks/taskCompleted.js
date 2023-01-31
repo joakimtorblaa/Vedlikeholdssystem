@@ -1,6 +1,6 @@
 const taskCompleted = (status) => {
 
-    if (status === 'Avsluttet') {
+    if (status === 'Fullført' || status === 'Avsluttet') {
         return true;
     } else {
         return false;

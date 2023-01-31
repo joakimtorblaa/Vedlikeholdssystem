@@ -34,7 +34,7 @@ const LocationTaskArchiveWidget = (widgetAdjust) => {
             if (data.length <= 0) {
                 setTasks(null);
             } else {
-                const filteredData = data.filter((task) => task.completed === true);
+                const filteredData = data.filter((task) => task.taskStatus === 'Fullført' || task.taskStatus === 'Avsluttet');
                 setTasks(filteredData.slice(0).reverse());
                 setNoOfPages(Math.ceil(filteredData.length / itemsPerPage ));
             }
@@ -55,7 +55,7 @@ const LocationTaskArchiveWidget = (widgetAdjust) => {
                             fontWeight="bold"
                             variant="h4"
                         >
-                            Fullførte oppgaver
+                            Fullførte/avsluttede oppgaver
                         </Typography>
                     </ListItem>
                     <Divider/>

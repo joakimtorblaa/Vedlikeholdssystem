@@ -45,7 +45,7 @@ const LocationTaskWidget = (widgetAdjust) => {
             if (data.length <= 0) {
                 setTasks(null);
             } else {
-                const filteredData = data.filter((task) => task.completed === false);
+                const filteredData = data.filter((task) => task.taskStatus !== 'Avsluttet' && task.taskStatus !== 'Fullført');
                 setTasks(filteredData.slice(0).reverse());
                 setNoOfPages(Math.ceil(filteredData.length / itemsPerPage ));
             }

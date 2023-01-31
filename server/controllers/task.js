@@ -117,7 +117,7 @@ export const addTaskComment = async (req, res) => {
         task.comments.push(newCommentString);
         await task.save();
 
-        res.status(201).json('Added comment to task')
+        res.status(201).json('Added comment to task');
     } catch (err) {
         res.status(409).json({ message: err.message });
     }
@@ -126,18 +126,32 @@ export const addTaskComment = async (req, res) => {
 export const addTaskCollaborator = async (req, res) => {
     try {
         const { id, collaborators } = req.params;
-        console.log('test');
         const parsedCollaborators = JSON.parse(collaborators);
-        console.log(parsedCollaborators);
+
         const task = await Task.findById(id);
         for (let item in parsedCollaborators) {
             task.collaborators.push(parsedCollaborators[item])
         }
         await task.save();
 
-        res.status(201).json('Added collaborator/s to task')
+        res.status(201).json('Added collaborator/s to task');
     } catch (err) {
-        res.status(409).json({ message: err.message })
+        res.status(409).json({ message: err.message });
+    }
+}
+
+export const removeTaskCollaborator = async (req, res) => {
+    try {
+        const { id, collaborators } = req.params;
+        const parsedCollaborators = JSON.parse(collaborators);
+
+        const task = await Task.findById(id);
+        task.collaborators = task.collaborators.filter(i => !parsedCollaborators.includes(i));
+        await task.save();
+        
+        res.status(201).json('Removed collaborator/s from task');
+    } catch (err) {
+        res.status(409).json({ message: err.message });
     }
 }
 

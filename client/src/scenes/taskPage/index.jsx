@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import TaskControlWidget from "../../widgets/TaskControlWidget";
 import TaskMainWidget from "../../widgets/TaskMainWidget";
 import WidgetWrapper from "../../components/WidgetWrapper";
@@ -13,6 +13,7 @@ import titleNotifications from "../../hooks/titleNotifications";
 
 const TaskPage = ({socket}) => {
     const { id } = useParams(); 
+    const navigate = useNavigate();
     const token = useSelector((state) => state.token);
     const notifications = useSelector((state) => state.notifications);
     const [task, setTask] = useState(null);
@@ -32,9 +33,19 @@ const TaskPage = ({socket}) => {
         
     }
 
+    const refreshTask =  (data) => {
+        if (data === id) {
+            getTask();
+        }
+    }
+
     useEffect(() => {
         getTask();
     }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        socket.on('refreshTask', (data) => refreshTask(data));
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!task) {
         return null;

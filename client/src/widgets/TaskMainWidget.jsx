@@ -7,7 +7,7 @@ import Collaborators from "../components/Collaborators";
 import LocationComponent from "../components/LocationComponent";
 import { useSelector } from "react-redux";
 
-const TaskMainWidget = (task) => {
+const TaskMainWidget = ({task}) => {
     
     const {
         collaborators,
@@ -20,7 +20,7 @@ const TaskMainWidget = (task) => {
         taskStatus,
         taskType,
         userId
-    } = task.task;
+    } = task;
     
     
 
