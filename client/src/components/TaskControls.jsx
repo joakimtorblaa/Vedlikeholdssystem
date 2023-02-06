@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import accessControl from "../hooks/accessControl";
-import { TaskAddColabForm, TaskRemoveColabForm } from "./TaskControlForms";
+import { TaskAddColabForm, TaskEditForm, TaskRemoveColabForm } from "./TaskControlForms";
 
 const TaskDisable = () => {
     const { id } = useParams();
@@ -157,10 +157,11 @@ const TaskRemoveColab = ({allowedRoles, user, currentUsers, taskName, socket}) =
     return content;
 }
 
-const TaskEdit = ({allowedRoles, user}) => {
+const TaskEdit = ({allowedRoles, user, currentUsers, task, socket}) => {
     const token = useSelector((state) => state.token);
     const userId = useSelector((state) => state.user);
     const [roles, setRoles] = useState(null);
+    const [open, setOpen] = useState(false);
 
     const getUserRole = async () => {
         const response = await fetch(
@@ -176,15 +177,38 @@ const TaskEdit = ({allowedRoles, user}) => {
         setRoles(accessControl(data));
     }
 
+    const handleOpen = () => {
+        setOpen(true);
+    }
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
     if (!roles) {
         getUserRole();
         return null;
     }
 
     const content = (roles.some(role => allowedRoles.includes(role)) || userId === user
-        ?   <Button variant="outlined" color="info">
+        ?   
+        <Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+            >
+                <DialogContent>
+                    <IconButton onClick={handleClose}>
+                        <Close />
+                    </IconButton>
+                    <TaskEditForm task={task} currentUsers={currentUsers} socket={socket} handleClose={handleClose}/>
+                </DialogContent>
+            </Dialog>
+            <Button variant="outlined" color="info" onClick={handleOpen}>
                 <Edit/>endre oppgave
             </Button>
+        </Box>
+        
         : <></>
        )
     return content;

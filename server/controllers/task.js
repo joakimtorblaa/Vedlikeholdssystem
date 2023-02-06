@@ -99,6 +99,47 @@ export const updateTask = async (req, res) => {
     }
 }
 
+export const patchDescTask = async (req, res) => {
+    try {
+        const { id, title, description } = req.params;
+        const task = await Task.findById(id);
+        task.taskName = title;
+        task.description = description;
+
+        await task.save();
+        res.status(201).json('Updated taskname/description');
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
+export const patchTypeTask = async (req, res) => {
+    try {
+        const { id, type } = req.params;
+        const task = await Task.findById(id);
+        task.taskType = type;
+
+        await task.save();
+        res.status(201).json('Updated tasktype');
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
+export const patchDateTask = async (req, res) => {
+    try {
+        const { id, startDate, deadline } = req.params;
+        const task = await Task.findById(id);
+        task.startDate = startDate;
+        task.deadline = deadline;
+
+        await task.save();
+        res.status(201).json('Updated startdate/deadline');
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
 export const addTaskComment = async (req, res) => {
     try {
         const { id, content, postedBy } = req.params;

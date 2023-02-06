@@ -62,9 +62,15 @@ const TaskMainWidget = ({task}) => {
                 <Typography>
                     <b>Startdato:</b> {moment(startDate).utc().format('DD.MM.YY')}
                 </Typography>
-                <Typography>
-                    <b>Oppgavefrist:</b> {moment(deadline).utc().format('DD.MM.YY')}
-                </Typography>
+                {moment(startDate).isBefore(moment(), 'day') ? (
+                    <Typography color="red">
+                        <b>Oppgavefrist:</b> {moment(deadline).utc().format('DD.MM.YY')}
+                    </Typography>
+                 ) : (
+                    <Typography>
+                        <b>Oppgavefrist:</b> {moment(deadline).utc().format('DD.MM.YY')}
+                    </Typography>
+                 )}
             </FlexBetween>
             <Divider />
             <Typography

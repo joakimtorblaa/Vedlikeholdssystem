@@ -63,16 +63,24 @@ const TaskControlWidget = ({task, socket}) => {
                     <TaskDisable/>
                 </DialogActions>
             </Dialog>
-            {taskCompleted(taskStatus) ? <><TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} /></> :
+            {taskCompleted(taskStatus) ? 
+                <>
+                    <FlexBetween>
+                        <TaskStatusUpdate allowedRoles={['admin']} user={userId} status={taskStatus} users={users} task={taskName} socket={socket}/>
+                        <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
+                    </FlexBetween>
+                    
+                </> 
+                :
                 <Box>
                     <FlexBetween>
-                        <TaskStatusUpdate status={taskStatus} users={users} task={taskName} socket={socket}/>
+                        <TaskStatusUpdate allowedRoles={['admin', 'user']} status={taskStatus} users={users} task={taskName} socket={socket}/>
                     </FlexBetween>
                         <Box padding="1rem 0">
                             <FlexBetween>
                                 <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
                                 <TaskRemoveColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
-                                <TaskEdit allowedRoles={'admin'} user={userId}/>
+                                <TaskEdit allowedRoles={'admin'} user={userId} currentUsers={collaborators} task={task} socket={socket}/>
                                 <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
                             </FlexBetween>
                         </Box>

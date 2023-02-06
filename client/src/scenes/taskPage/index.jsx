@@ -14,6 +14,7 @@ import titleNotifications from "../../hooks/titleNotifications";
 const TaskPage = ({socket}) => {
     const { id } = useParams(); 
     const navigate = useNavigate();
+    const user = useSelector((state) => state.user);
     const token = useSelector((state) => state.token);
     const notifications = useSelector((state) => state.notifications);
     const [task, setTask] = useState(null);
@@ -34,8 +35,16 @@ const TaskPage = ({socket}) => {
     }
 
     const refreshTask =  (data) => {
-        if (data === id) {
-            getTask();
+        if (data.id === id) {
+            if (data.user === user) {
+                navigate(-1);
+            } else {
+                getTask();
+            }
+        } else {
+            if (data === id) {
+                getTask();
+            }
         }
     }
 
@@ -45,6 +54,10 @@ const TaskPage = ({socket}) => {
 
     useEffect(() => {
         socket.on('refreshTask', (data) => refreshTask(data));
+    }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        socket.on('refreshTaskAndRemoveUser', (data) => refreshTask(data));
     }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!task) {

@@ -1,5 +1,13 @@
-import { Button, ListItemText, MenuItem, TextField, Typography } from "@mui/material";
+import { Button, Divider, ListItemText, MenuItem, TextField, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
+import 'moment/locale/nb';
+import moment from "moment";
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,9 +42,9 @@ const TaskAddColabForm = ({currentUsers, createdBy, taskName, socket, handleClos
                 }
             )
             for (let item in collaborator) {
-                handleNotifications(fullName, `${fullName} har lagt deg til ${taskName}.`, collaborator[item], `/task/${id}`, token);
+                handleNotifications(fullName, `${fullName} har lagt deg til ${taskName}.`, collaborator[item], `/task/${id}`, token, socket);
             }
-            socket.emit('taskCollaboratorUpdate', (id));
+            socket.emit('taskAddCollaborator', (id));
             handleClose();
         }      
     }
@@ -131,8 +139,9 @@ const TaskRemoveColabForm = ({currentUsers, createdBy, taskName, socket, handleC
             )
             for (let item in collaborator) {
                 handleNotifications(fullName, `${fullName} har fjernet deg fra ${taskName}.`, collaborator[item], `/task/${id}`, token, socket);
+                socket.emit('taskRemoveCollaborator', ({id: id, user: collaborator[item]}));
             }
-            socket.emit('taskCollaboratorUpdate', (id));
+            
             handleClose();
         }      
     }
@@ -195,11 +204,378 @@ const TaskRemoveColabForm = ({currentUsers, createdBy, taskName, socket, handleC
             <Button disabled={changed} onClick={() => removeColab()}>Fjern</Button>
         </Box>
     )
-
+    
 }
 
-const TaskEditForm = () => {
+const descSchema = yup.object().shape({
+    taskName: yup.string().required("Vennligst fyll inn navn på oppgave"),
+    description: yup.string().required("Vennligst legg inn beskrivelse")
+});
 
+const typeSchema = yup.object().shape({
+    taskType: yup.string().required("Vennligst velg oppgavetype"),
+});
+
+const dateSchema = yup.object().shape({
+    startDate: yup.date().required("Vennligst angi startdato på oppgave"),
+    deadline: yup.date().when(
+        'startDate', (startDate, schema) => {
+            if (startDate) {
+                const dayAfter = new Date(startDate.getTime() + 86400000);
+
+                return schema.min(dayAfter, 'Sluttdato må være minst en dag etter startdato.');
+            }
+            return schema;
+        }
+    ).required()
+});
+
+const TaskEditForm = ({task, currentUsers, socket, handleClose}) => {
+    const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+    const { id } = useParams();
+    const token = useSelector((state) => state.token);
+    const fullName = useSelector((state) => state.fullName);
+    const [changed, setChanged] = useState(true);
+    const {
+        _id,
+        taskName,
+        description,
+        taskType,
+        startDate,
+        deadline,
+        collaborators
+    } = task;
+
+    const taskTypes = [
+        "Vedlikehold",
+        "Tilsyn",
+        "Oppfølging",
+        "Ekstern kontroll",
+        "Restaurering"
+    ]
+
+    let initialDescValues = {
+        taskName: taskName,
+        description: description
+    }
+
+    let initialTypeValues = {
+        taskType: taskType
+    }
+
+    let initialDateValues = {
+        startDate: startDate,
+        deadline: deadline
+    }
+
+    const patchDesc = async (values) => {
+        const response = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/patchDesc/${values.taskName}/${values.description}`,
+            {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}`}
+            }
+        )
+        const data = await response.json();
+        if (data) {
+            if (values.taskName !== taskName && values.description !== description) {
+                //if title and description has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret navn og beskrivelse på oppgaven '${taskName}'.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            }
+            else if (values.taskName !== taskName) {
+                //if title has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret navn på oppgave '${taskName}' til '${values.taskName}'.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            } 
+            else if (values.description !== description) {
+                //if description has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret oppgavebeskrivelsen til '${taskName}'.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            }
+            socket.emit('taskInfoUpdate', (id));
+            handleClose();
+        }
+    }
+
+    const patchType = async (values) => {
+        const response = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/patchType/${values.taskType}`,
+            {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}`}
+            }
+        )
+        const data = await response.json();
+        if (data) {
+            if (values.taskType !== taskType) {
+                //if taskType has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret oppgavetype på '${taskName}' til ${values.taskType}.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            }
+            socket.emit('taskInfoUpdate', (id));
+            handleClose();
+        }
+    }
+
+    const patchDate = async (values) => {
+        const response = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/patchDate/${values.startDate}/${values.deadline}`,
+            {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}`}
+            }
+        )
+        const data = await response.json();
+        if (data) {
+            if (values.startDate !== startDate && values.deadline !== deadline) {
+                //if startdate and deadline has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret startdato og oppgavefrist på '${taskName}'.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            }
+            else if (values.startDate !== startDate) {
+                //if startdate has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret startdato på '${taskName}' til ${moment(values.startDate).utc().format('DD.MM.YY')}.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            }
+            else if (values.deadline !== deadline) {
+                //if deadline has changed
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret oppgavefrist på '${taskName}' til ${moment(values.deadline).utc().format('DD.MM.YY')}.`, collaborators[item], `/task/${id}`, token, socket);
+                }
+            }
+            socket.emit('taskInfoUpdate', (id));
+            handleClose();
+        }
+    }
+
+    const handleFormDesc = (values, onSubmitProps) => {
+        patchDesc(values);
+    }
+
+    const handleFormType = (values, onSubmitProps) => {
+        patchType(values);
+    }
+
+    const handleFormDate = (values, onSubmitProps) => {
+        patchDate(values);
+    }
+
+    return (
+        <Box width="400px">
+            <Typography variant="h3" padding="0.5rem 0">
+                Endre oppgave
+            </Typography>
+            <Typography paddingTop="10px" paddingBottom="10px">
+                <b>Tittel og beskrivelse</b>
+            </Typography>
+            <Formik
+                onSubmit={handleFormDesc}
+                initialValues={initialDescValues}
+                validationSchema={descSchema}
+            >
+                {({
+                    values,
+                    errors,
+                    touched,
+                    handleBlur,
+                    handleChange,
+                    handleSubmit,
+                    setFieldValue,
+                }) => ( 
+                    <form onSubmit={handleSubmit}>
+                        <Box
+                            display="grid"
+                            gap="30px"
+                        >
+                            <TextField 
+                                fullWidth
+                                label="Oppgavetittel"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.taskName}
+                                name="taskName"
+                                error={Boolean(touched.taskName) && Boolean(errors.taskName)}
+                                helperText={touched.taskName && errors.taskName}
+                                sx={{ gridColumn: "span 4"}}
+                            />
+                            <TextField 
+                                fullWidth
+                                label="Oppgavebeskrivelse"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.description}
+                                name="description"
+                                error={Boolean(touched.description) && Boolean(errors.description)}
+                                helperText={touched.description && errors.description}
+                                sx={{ gridColumn: "span 4"}}
+                            />
+                            
+                        </Box>
+                        <Button type="submit">Lagre endringer</Button>
+                    </form>
+                )}
+            </Formik>
+            <Divider/>
+            <Typography paddingTop="10px" paddingBottom="10px">
+                <b>Oppgavetype</b>
+            </Typography>
+            <Formik
+                onSubmit={handleFormType}
+                initialValues={initialTypeValues}
+                validationSchema={typeSchema}
+            >
+                {({
+                    values,
+                    errors,
+                    touched,
+                    handleBlur,
+                    handleChange,
+                    handleSubmit,
+                    setFieldValue,
+                }) => ( 
+                    <form onSubmit={handleSubmit}>
+                        <Box
+                            display="grid"
+                            gap="30px"
+                        >
+                            <TextField
+                                select
+                                fullWidth
+                                label="Oppgavetype"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.taskType}
+                                name="taskType"
+                                error={Boolean(touched.taskType) && Boolean(errors.taskType)}
+                                helperText={touched.taskType && errors.taskType}
+                                sx={{ gridColumn: "span 4"}}
+                            >
+                                {taskTypes.map((type) => (
+                                    <MenuItem key={type} value={type}>
+                                        <ListItemText primary={type} />
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Box>
+                        <Button type="submit">Lagre endringer</Button>
+                    </form>
+                )}
+            </Formik>
+            <Divider/>
+            <Typography paddingTop="10px" paddingBottom="10px">
+                <b>Start og sluttdato</b>
+            </Typography>
+            <Formik
+                onSubmit={handleFormDate}
+                initialValues={initialDateValues}
+                validationSchema={dateSchema}
+            >
+                {({
+                    values,
+                    errors,
+                    touched,
+                    handleBlur,
+                    handleChange,
+                    handleSubmit,
+                    setFieldValue,
+                }) => ( 
+                    <form onSubmit={handleSubmit}>
+                        <Box
+                            display="grid"
+                            gap="30px"
+                        >
+                            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'nb'}>
+                                {isNonMobileScreens ? (
+                                    <DesktopDatePicker
+                                        label="Startdato for oppgave"
+                                        onBlur={handleBlur}
+                                        onChange={(newValue) => setFieldValue('startDate', newValue, true)}
+                                        disablePast={true}
+                                        maxDate={values.deadline}
+                                        value={values.startDate}
+                                        renderInput={(params) => (
+                                            <TextField 
+                                                name="startDate"
+                                                error={Boolean(touched.startDate) && Boolean(errors.startDate)}
+                                                helperText={touched.startDate && errors.startDate}
+                                                sx={{ gridColumn: "span 4"}}
+                                                {...params}
+                                            />
+                                        )}
+                                    />
+
+                                ) : (
+                                    <MobileDatePicker
+                                        label="Startdato for oppgave"
+                                        onBlur={handleBlur}
+                                        onChange={(newValue) => setFieldValue('startDate', newValue, true)}
+                                        disablePast={true}
+                                        maxDate={values.deadline}
+                                        value={values.startDate}
+                                        renderInput={(params) => (
+                                            <TextField 
+                                                name="startDate"
+                                                error={Boolean(touched.startDate) && Boolean(errors.startDate)}
+                                                helperText={touched.startDate && errors.startDate}
+                                                sx={{ gridColumn: "span 4"}}
+                                                {...params}
+                                            />
+                                        )}
+                                    />
+                                )}
+                                {isNonMobileScreens ? (
+                                    <DesktopDatePicker
+                                        label="Sluttfrist for oppgave"
+                                        onBlur={handleBlur}
+                                        onChange={(newValue) => setFieldValue('deadline', newValue, true)}
+                                        disablePast={true}
+                                        minDate={values.startDate}
+                                        value={values.deadline}
+                                        renderInput={(params) => (
+                                            <TextField 
+                                                name="deadline"
+                                                error={Boolean(touched.deadline) && Boolean(errors.deadline)}
+                                                helperText={touched.deadline && errors.deadline}
+                                                sx={{ gridColumn: "span 4"}}
+                                                {...params}
+                                            />
+                                        )}
+                                    />
+
+                                ) : (
+                                    <MobileDatePicker
+                                        label="Sluttfrist for oppgave"
+                                        onBlur={handleBlur}
+                                        onChange={(newValue) => setFieldValue('deadline', newValue, true)}
+                                        disablePast={true}
+                                        minDate={values.startDate}
+                                        value={values.deadline}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                name="deadline"
+                                                error={Boolean(touched.deadline) && Boolean(errors.deadline)}
+                                                helperText={touched.deadline && errors.deadline}
+                                                sx={{ gridColumn: "span 4"}}
+                                                {...params}
+                                            />
+                                        )}
+                                    />
+                                )}
+                            </LocalizationProvider>
+                        </Box>
+                        <Button type="submit">Lagre endringer</Button>
+                    </form>
+                )}
+            </Formik>
+        </Box>
+    )
 }
 
 export {TaskAddColabForm, TaskRemoveColabForm, TaskEditForm}

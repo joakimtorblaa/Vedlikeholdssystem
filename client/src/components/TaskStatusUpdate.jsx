@@ -3,16 +3,19 @@ import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import accessControl from "../hooks/accessControl";
 import handleNotifications from "../hooks/handleNotifications";
 
     
-    const TaskStatusUpdate = ({status, users, task, socket}) => {
+    const TaskStatusUpdate = ({allowedRoles, user, status, users, task, socket}) => {
         const navigate = useNavigate();
         const { id } = useParams();
         const token = useSelector((state) => state.token);
         const fullName = useSelector((state) => state.fullName);
+        const userId = useSelector((state) => state.user);
         const [currentStatus, setCurrentStatus] = useState(status);
         const [changed, setChanged] = useState(true);
+        const [roles, setRoles] = useState(null);
 
         const taskStatus = [
             "Nylig opprettet",
@@ -24,12 +27,11 @@ import handleNotifications from "../hooks/handleNotifications";
             "Fullført"
         ]
 
-
         const updateTask = async () => {
 
             // eslint-disable-next-line
             const response = await fetch(
-                `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/${currentStatus}/${fullName}`,
+                `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${id}/status/${currentStatus}/${fullName}`,
                 {
                     method: "PATCH",
                     headers: { 
@@ -60,7 +62,7 @@ import handleNotifications from "../hooks/handleNotifications";
 
         useEffect(() => {
             setCurrentStatus(status);
-        }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
         const handleUpdate = (status) => {
             if (status === "Fullført"){
@@ -80,7 +82,28 @@ import handleNotifications from "../hooks/handleNotifications";
             setCurrentStatus(e.target.value);
             setChanged(false);
         }
-        return (
+
+        const getUserRole = async () => {
+            const response = await fetch(
+                `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/users/${userId}/userType`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+            const data = await response.json();
+            setRoles(accessControl(data));
+        }
+    
+        
+    
+        if (!roles) {
+            getUserRole();
+            return null;
+        }
+        const content = (roles.some(role => allowedRoles.includes(role)) || userId === user ?
             <>  
                 <Box
                     display="flex"
@@ -103,7 +126,11 @@ import handleNotifications from "../hooks/handleNotifications";
                 </Box>
                 
             </>
+        :
+        <></>
         )
+
+        return content;
     }
 
     export default TaskStatusUpdate;

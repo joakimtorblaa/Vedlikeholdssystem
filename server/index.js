@@ -140,11 +140,17 @@ io.on('connection', (socket) => {
     socket.on('taskFile', (id) => {
         io.emit('refreshTaskFiles', (id));
     });
+    socket.on('taskInfoUpdate', (id) => {
+        io.emit('refreshTask', (id));
+    });
     socket.on('taskStatusUpdate', (id) => {
         io.emit('refreshTask', (id));
-    })
-    socket.on('taskCollaboratorUpdate', (id) => {
+    });
+    socket.on('taskAddCollaborator', (id) => {
         io.emit('refreshTask', (id));
+    });
+    socket.on('taskRemoveCollaborator', ({id, user}) => {
+        io.emit('refreshTaskAndRemoveUser', ({id, user}));
     })
 
     //notifications
