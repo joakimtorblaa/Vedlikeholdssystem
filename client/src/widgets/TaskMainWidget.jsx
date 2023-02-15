@@ -6,6 +6,7 @@ import UserComponent from "../components/UserComponent";
 import Collaborators from "../components/Collaborators";
 import LocationComponent from "../components/LocationComponent";
 import { useSelector } from "react-redux";
+import SubTaskComponent from "../components/SubTaskComponent";
 
 const TaskMainWidget = ({task}) => {
     
@@ -16,6 +17,7 @@ const TaskMainWidget = ({task}) => {
         description,
         locationId,
         startDate,
+        subTask,
         taskName,
         taskStatus,
         taskType,
@@ -102,6 +104,25 @@ const TaskMainWidget = ({task}) => {
                     <Collaborators collaborator={collaborators}/>
                 </Box>
             )}
+            {subTask.length === 0 ?  (
+                <></>
+            ) : (
+                <Box>
+                    <Typography
+                        padding="5px 0"
+                        variant="h5"
+                    >
+                        Underoppgaver
+                    </Typography>
+                    <Box display="flex" flexWrap="wrap" justifyContent="space-between">
+                        {subTask.map((item) => (
+                            <SubTaskComponent info={item}/>
+                        ))}  
+                    </Box>
+                </Box>
+                
+            )}
+            
         </Box>
     )
 }

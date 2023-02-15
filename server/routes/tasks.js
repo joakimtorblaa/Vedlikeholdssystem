@@ -1,5 +1,5 @@
 import express from "express";
-import { getTask, getTasks, getLocationTasks, updateTask, addTaskComment, disableTask, getTaskComments, uploadFileTask, getTaskFiles, deleteTaskFile, addTaskCollaborator, getTaskHistory, removeTaskCollaborator, patchDescTask, patchTypeTask, patchDateTask } from "../controllers/task.js";
+import { getTask, getTasks, getLocationTasks, updateTask, addTaskComment, disableTask, getTaskComments, uploadFileTask, getTaskFiles, deleteTaskFile, addTaskCollaborator, getTaskHistory, removeTaskCollaborator, patchDescTask, patchTypeTask, patchDateTask, patchTaskSubtasks } from "../controllers/task.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -22,4 +22,5 @@ router.patch("/:id/:fileIndex", verifyToken, deleteTaskFile);
 router.patch("/:id/disabled", verifyToken, disableTask);
 router.patch("/:id/collaborators/:collaborators/new", verifyToken, addTaskCollaborator);
 router.patch("/:id/collaborators/:collaborators/remove", verifyToken, removeTaskCollaborator)
+router.patch("/:id/subTask/:subtasks", verifyToken, patchTaskSubtasks);
 export default router;

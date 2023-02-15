@@ -235,7 +235,6 @@ const TaskEditForm = ({task, currentUsers, socket, handleClose}) => {
     const { id } = useParams();
     const token = useSelector((state) => state.token);
     const fullName = useSelector((state) => state.fullName);
-    const [changed, setChanged] = useState(true);
     const {
         _id,
         taskName,
@@ -578,4 +577,128 @@ const TaskEditForm = ({task, currentUsers, socket, handleClose}) => {
     )
 }
 
-export {TaskAddColabForm, TaskRemoveColabForm, TaskEditForm}
+const TaskAddSubtaskForm = ({task, socket, handleClose}) => {
+    const token = useSelector((state) => state.token);
+    const fullName = useSelector((state) => state.fullName);
+    const [tasks, setTasks] = useState(null);
+    const [subTasks, setSubTasks] = useState([]);
+    const [changed, setChanged] = useState(true);
+
+    const {
+        _id,
+        locationId,
+        taskName,
+        collaborators
+    } = task;
+
+    const getLocationTasks = async () => {
+        const response = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/locationId/${locationId}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (data.length <= 0) {
+                setTasks(null);
+            } else {
+                const filteredData = data.filter((task) => task.taskStatus !== 'Avsluttet' && task.taskStatus !== 'Fullført');
+                setTasks(filteredData.slice(0).reverse());
+            }
+    }
+    
+    const updateSubTasks = async () => {
+        const subTaskString = JSON.stringify(subTasks);
+        const response = await fetch(
+            `${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/tasks/${_id}/subTask/${subTaskString}`,
+            {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        const data = await response.json();
+        if (task.subTask.length === data.length && task.subTask.every((value, index) => value === data[index])) {
+            handleClose();
+        } else {
+            if (task.subTask.length > subTasks.length) {
+                //fjerne underoppgaver
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} fjernet en eller flere underoppgaver fra '${taskName}'.`, collaborators[item], `/task/${_id}`, token, socket);
+                }
+                socket.emit('taskUpdateSubtasks', (_id));
+                handleClose();
+            } else if (task.subTask.length === subTasks.length) {
+                //samme antall, men endret underoppgaver
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} endret underoppgaver på '${taskName}'.`, collaborators[item], `/task/${_id}`, token, socket);
+                }
+                socket.emit('taskUpdateSubtasks', (_id));
+                handleClose();
+            } else if (task.subTask.length < subTasks.length) {
+                //legger til underoppgaver
+                for (let item in collaborators) {
+                    handleNotifications(fullName, `${fullName} la til en eller flere underoppgaver på '${taskName}'.`, collaborators[item], `/task/${_id}`, token, socket);
+                }
+                socket.emit('taskUpdateSubtasks', (_id));
+                handleClose();
+            }
+        }
+    }
+
+    useEffect(() => {
+        getLocationTasks();
+        setSubTasks(task.subTask);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const handleChangeMultiple = (e) => {
+        setSubTasks(e.target.value);
+        setChanged(false);
+    }
+
+    return (
+        <Box width="400px">
+            <Typography padding="0.5rem 0">
+                Legg til 
+            </Typography>
+            {!tasks ? (
+                <></>
+            ) : (
+                <Box>
+                    <TextField
+                        select
+                        label="Underoppgaver"
+                        SelectProps={{
+                            multiple: true,
+                            onChange: handleChangeMultiple
+                        }}
+                        value={subTasks}
+                        name="collaborators"
+                        fullWidth
+                    >
+                    <MenuItem key="0" disabled value="" label="Legg til bruker">
+                                Fjern bruker
+                            </MenuItem>
+                            {tasks.map((task) => (
+                            <MenuItem
+                                key={task._id}
+                                value={task._id}
+                            >
+                                <ListItemText
+                                    primary={task.taskName}
+                                    secondary={task.taskStatus}
+                                />
+                            </MenuItem>
+                            ))}
+                    </TextField>
+                    <Button disabled={changed} onClick={() => updateSubTasks()}>Oppdater</Button>
+                </Box>
+            )}
+        </Box>
+    )
+}
+
+export {TaskAddColabForm, TaskRemoveColabForm, TaskEditForm, TaskAddSubtaskForm}

@@ -37,7 +37,6 @@ const NotificationComponent = ({socket}) => {
             }
         );
         const fetchedNotifications = await response.json();
-        console.log(await getAllNotifications(user, token))
         if (fetchedNotifications) {
             setNotifications(fetchedNotifications.notifications);
             const totalNotifications = await getAllNotifications(user, token);

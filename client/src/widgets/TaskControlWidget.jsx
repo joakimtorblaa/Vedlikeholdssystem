@@ -3,7 +3,7 @@ import { Box } from "@mui/system";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import FlexBetween from "../components/FlexBetween";
-import { TaskAddColab, TaskDisable, TaskEdit, TaskRemoveColab } from "../components/TaskControls";
+import { TaskAddColab, TaskAddSubtask, TaskDisable, TaskEdit, TaskRemoveColab } from "../components/TaskControls";
 import TaskStatusUpdate from "../components/TaskStatusUpdate";
 import TaskDelete from "../features/auth/TaskDeleteAuth";
 import taskCompleted from "../hooks/taskCompleted";
@@ -14,9 +14,8 @@ const TaskControlWidget = ({task, socket}) => {
         collaborators,
         taskName,
         taskStatus,
-        userId
+        userId,
     } = task;
-
     /* ADDING RECIEVERS OF NOTIFICATIONS */
     const user = useSelector((state) => state.user);
     
@@ -74,13 +73,14 @@ const TaskControlWidget = ({task, socket}) => {
                 :
                 <Box>
                     <FlexBetween>
-                        <TaskStatusUpdate allowedRoles={['admin', 'user']} status={taskStatus} users={users} task={taskName} socket={socket}/>
+                        <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
+                        <TaskRemoveColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
+                        <TaskAddSubtask allowedRoles={'admin'} user={userId} currentUsers={collaborators} task={task} socket={socket}/>
+                        <TaskEdit allowedRoles={'admin'} user={userId} task={task} socket={socket}/>
                     </FlexBetween>
                         <Box padding="1rem 0">
                             <FlexBetween>
-                                <TaskAddColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
-                                <TaskRemoveColab allowedRoles={'admin'} user={userId} currentUsers={collaborators} taskName={taskName} socket={socket}/>
-                                <TaskEdit allowedRoles={'admin'} user={userId} currentUsers={collaborators} task={task} socket={socket}/>
+                                <TaskStatusUpdate allowedRoles={['admin', 'user']} status={taskStatus} users={users} task={taskName} socket={socket}/>
                                 <TaskDelete allowedRoles={'admin'} user={userId} handleOpen={handleOpen} />
                             </FlexBetween>
                         </Box>

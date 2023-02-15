@@ -196,6 +196,22 @@ export const removeTaskCollaborator = async (req, res) => {
     }
 }
 
+export const patchTaskSubtasks = async (req, res) => {
+    try {
+        const {id, subtasks} = req.params;
+        const parsedSubtasks = JSON.parse(subtasks);
+        
+        const task = await Task.findById(id);
+        console.log(task.subTask);
+        console.log(parsedSubtasks);
+        task.subTask = parsedSubtasks;
+        await task.save();
+        res.status(201).json(task.subTask);
+    } catch (err) {
+        res.status(409).json({ message: err.message });
+    }
+}
+
 export const getTaskComments = async (req, res) => {
     try {
         const { id } = req.params;

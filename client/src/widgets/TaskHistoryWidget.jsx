@@ -55,7 +55,6 @@ const TaskHistoryWidget = ({socket}) => {
         socket.on('refreshHistory', (data) => handleNewHistory(data));
     }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    console.log(list);
     return (
         <Box>
             <Typography

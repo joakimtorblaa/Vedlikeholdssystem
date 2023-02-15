@@ -34,8 +34,6 @@ export const authSlice = createSlice({
             }
         },
         setHelmetNotifications: (state, action) => {
-            console.log(action.payload);
-            console.log(state.notifications);
             state.notifications = action.payload.notifications;
         }
     }

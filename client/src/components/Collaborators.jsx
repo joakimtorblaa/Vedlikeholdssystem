@@ -1,15 +1,17 @@
-import UserComponent from "./UserComponent";
+import { AvatarGroup, Box } from "@mui/material";
+import CollaboratorComponent from "./CollaboratorComponent";
 
 const Collaborators = (info) => {
-    console.log(info.collaborator.length);
     return (
-        <>
-
+        <Box
+            display="flex"
+            width="100%"
+        >
         {info.collaborator.map((colab) => (
-                    <UserComponent key={colab} createdBy={colab}/>
+                    <CollaboratorComponent key={colab} createdBy={colab}/>
                 ))}
-                
-        </>
+        </Box>      
+        
     )
 }
 

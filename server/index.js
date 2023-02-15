@@ -151,7 +151,10 @@ io.on('connection', (socket) => {
     });
     socket.on('taskRemoveCollaborator', ({id, user}) => {
         io.emit('refreshTaskAndRemoveUser', ({id, user}));
-    })
+    });
+    socket.on('taskUpdateSubtasks', (id) => {
+        io.emit('refreshTask', (id));
+    });
 
     //notifications
     socket.on('createNotification', (id) => {
