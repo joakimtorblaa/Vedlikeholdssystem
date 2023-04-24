@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemText, Pagination, Typography } from "@mui/material";
+import { List, ListItem, ListItemText, Pagination, Skeleton, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -47,6 +47,8 @@ const TaskHistoryWidget = ({socket}) => {
         }
     }
 
+    
+
     useEffect(() => {
         getTaskHistory();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -54,7 +56,7 @@ const TaskHistoryWidget = ({socket}) => {
     useEffect(() => {
         socket.on('refreshHistory', (data) => handleNewHistory(data));
     }, [socket]); // eslint-disable-line react-hooks/exhaustive-deps
-
+    
     return (
         <Box>
             <Typography
@@ -63,6 +65,7 @@ const TaskHistoryWidget = ({socket}) => {
                 >
                     Oppgavehistorikk
                 </Typography>
+                
                 <List>
                     {list
                     .slice((page - 1) * itemsPerPage, page * itemsPerPage)
@@ -74,6 +77,15 @@ const TaskHistoryWidget = ({socket}) => {
                             />
                         </ListItem>
                     ))}
+                    {list.length === 0 ? (
+                        <Box>
+                            <Skeleton animation="wave"/>
+                            <Skeleton animation="wave"/>
+                            <Skeleton animation="wave"/>
+                        </Box>
+                    ) : (
+                        <></>
+                    )}
                 </List>
                 {list.length > 5 ? (
                     <Box 
@@ -96,6 +108,7 @@ const TaskHistoryWidget = ({socket}) => {
                 )}
         </Box>
     )
+
 }
 
 export default TaskHistoryWidget;

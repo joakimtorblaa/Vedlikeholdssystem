@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Box,
     IconButton,
@@ -7,7 +7,9 @@ import {
     MenuItem,
     FormControl,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    Tooltip,
+    Avatar
 } from '@mui/material';
 import {
     DarkMode,
@@ -22,13 +24,17 @@ import FlexBetween from '../../components/FlexBetween';
 import AdminNavigate from '../../features/auth/AdminNavigateAuth';
 import NotificationComponent from '../../components/NotificationComponent';
 import MessageComponent from '../../components/MessagesComponent';
+import AccountComponent from '../../components/AccountComponent';
 
 const Navbar = ({socket}) => {
     const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
     const location = useLocation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const user = useSelector((state) => state.fullName);
+    const fullName = useSelector((state) => state.fullName);
+    const userId = useSelector((state) => state.user);
+    const token = useSelector((state) => state.token);
+    const [user, setUser] = useState(null);
     const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
     const theme = useTheme();
@@ -37,6 +43,29 @@ const Navbar = ({socket}) => {
     const background = theme.palette.background.default;
     const primaryLight = theme.palette.primary.light;
     const alt = theme.palette.background.alt;
+    
+    const getUser = async () => {
+        const response = await fetch(`${process.env.REACT_APP_DEVELOPMENT_DATABASE_URL}/users/${userId}`,
+        {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        setUser(data);
+    }
+
+    useEffect(() => {
+        getUser();
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (!user) {
+        return null;
+    }
+
+    const {
+        picturePath
+    } = user;
+    console.log(picturePath);
 
     return (
         <>
@@ -61,40 +90,9 @@ const Navbar = ({socket}) => {
                 {/* DESKTOP NAV */}
                 {isNonMobileScreens ? (
                     <FlexBetween gap="2rem">
-                        <IconButton onClick={() => dispatch(setMode())}>
-                            {theme.palette.mode === "dark" ? (
-                                <DarkMode sx={{ fontSize: "25px" }} />
-                            ) : (
-                                <LightMode sx={{ color: dark, fontSize: "25px"}} />
-                            )}
-                        </IconButton>
                         <MessageComponent socket={socket}/>
                         <NotificationComponent socket={socket}/>
-                        <AdminNavigate allowedRoles={'admin'} />
-                            
-                        <FormControl variant="standard" value={user}>
-                            <Select
-                                value={user}
-                                sx={{
-                                    backgroundColor: neutralLight,
-                                    width: "150px",
-                                    borderRadius: "0.25rem",
-                                    p: "0.25rem 1rem",
-                                    "& .MuiSvgIcon-root": {
-                                        pr: "0.25rem",
-                                        width: "3rem",
-                                    },
-                                    "& .MuiSelect-select:focus": {
-                                        backgroundColor: neutralLight,
-                                    },
-                                }}
-                            >
-                                <MenuItem value={user}>
-                                    <Typography>{user}</Typography>
-                                </MenuItem>
-                                <MenuItem onClick={() => dispatch(setLogout())}>Logg ut</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <AccountComponent socket={socket} image={picturePath}/>
                     </FlexBetween>
                 ) : (
                     <IconButton
@@ -146,9 +144,9 @@ const Navbar = ({socket}) => {
                             <MessageComponent socket={socket}/>
                             <NotificationComponent socket={socket}/>
                             <AdminNavigate allowedRoles={'admin'} />
-                            <FormControl variant="standard" value={user}>
+                            <FormControl variant="standard" value={fullName}>
                                 <Select
-                                    value={user}
+                                    value={fullName}
                                     sx={{
                                         backgroundColor: neutralLight,
                                         width: "150px",
@@ -163,8 +161,8 @@ const Navbar = ({socket}) => {
                                         },
                                     }}
                                 >
-                                    <MenuItem value={user}>
-                                        <Typography>{user}</Typography>
+                                    <MenuItem value={fullName}>
+                                        <Typography>{fullName}</Typography>
                                     </MenuItem>
                                     <MenuItem onClick={() => dispatch(setLogout())}>
                                         Logg ut
