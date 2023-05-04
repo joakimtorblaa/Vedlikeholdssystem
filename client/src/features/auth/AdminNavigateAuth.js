@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import accessControl from "../../hooks/accessControl";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import { Box, IconButton, MenuItem, Typography } from "@mui/material";
+import { Box, Divider, IconButton, MenuItem, Typography } from "@mui/material";
 import { AdminPanelSettings } from "@mui/icons-material";
 
 const AdminNavigate = ({ allowedRoles }) => {
@@ -33,11 +33,15 @@ const AdminNavigate = ({ allowedRoles }) => {
         
     const content = (roles.some(role => allowedRoles.includes(role))
         ?   
+        <>
             <MenuItem onClick={() => navigate("/admin/dashboard")}>
-                    <AdminPanelSettings sx={{ fontSize: "25px", marginRight: "5px" }}/>
+                    <AdminPanelSettings sx={{ marginRight: "5px" }}/>
                     <Typography>Admin</Typography>
             </MenuItem>
-        
+            <Divider/>
+        </>
+            
+            
         : <></>
        )
     return content;
