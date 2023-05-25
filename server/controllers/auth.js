@@ -43,7 +43,7 @@ export const login = async (req, res) => {
     try {
         const { userName, password } = req.body;
         const user = await User.findOne({ userName: userName });
-        
+
         if (!user) return res.status(400).json({msg: "User does not exist."});
 
         const isMatch = await bcrypt.compare(password, user.password);
