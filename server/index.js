@@ -50,7 +50,7 @@ app.use("/assets", express.static(path.join(__dirname, 'public/assets')));
 const httpServer = http.createServer(app)
 const io = new Server(httpServer, {
     cors: {
-        origin:['http://localhost:3000', 'http://192.168.50.10:3000']
+        origin:['http://localhost:3000', 'http://192.168.50.5:3000']
     }
 });
 
@@ -194,5 +194,5 @@ mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
-    httpServer.listen(PORT, "192.168.50.10", () => console.log(`Server Port: ${PORT}`));
+    httpServer.listen(PORT, "192.168.50.5", () => console.log(`Server Port: ${PORT}`));
 }).catch((error) => console.log(`${error} did not connect`));

@@ -105,7 +105,6 @@ const MessageWidget = ({socket}) => {
         )
         const userData = await userResponse.json();
         setChatUserInfo(userData);
-        console.log(userData);
         
         
         //get name of other user for helmet
